@@ -1,0 +1,1 @@
+// Wrapper o tipo personalizado para tauri::State
