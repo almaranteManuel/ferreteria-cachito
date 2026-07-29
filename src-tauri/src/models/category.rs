@@ -1,12 +1,9 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
-pub struct Purchase {
+pub struct Category {
     pub id: i64,
-    pub date: String,
-    pub total_amount: f64,
-    pub supplier_id: i64,
-    pub invoice_number: Option<String>,
+    pub name: String,
     pub created_at: String,
     pub updated_at: String,
 }

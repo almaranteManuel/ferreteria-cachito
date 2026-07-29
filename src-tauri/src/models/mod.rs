@@ -1,0 +1,10 @@
+pub mod product;
+pub mod category;
+pub mod supplier;
+pub mod sale_item;
+pub mod purchase_item;
+pub mod customer_payment;
+pub mod sale;
+pub mod purchase;
+pub mod customer;
+pub mod reminder;

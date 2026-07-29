@@ -5,7 +5,6 @@ pub mod repositories;
 pub mod services;
 
 use db::connection::init_database;
-use sqlx::SqlitePool;
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,9 +26,12 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            // Aquí irás registrando todos tus comandos, por ejemplo:
-            // commands::productos::obtener_productos,
-            // commands::ventas::registrar_venta,
+            // Product commands
+            commands::product_cmd::get_product_by_id,
+            commands::product_cmd::search_products,
+            commands::product_cmd::create_product,
+            commands::product_cmd::update_product,
+            commands::product_cmd::delete_product
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
