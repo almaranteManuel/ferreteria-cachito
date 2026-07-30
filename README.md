@@ -65,7 +65,7 @@ Asegúrate de contar con el entorno de desarrollo configurado:
 1. **Node.js** (v18 o superior) y **npm**
 2. **Rust & Cargo** (Instalado mediante [rustup.rs](https://rustup.rs/))
 3. Dependencias nativas de Tauri para tu SO (Ver [Tauri Prerequisites](https://v2.tauri.app/start/prerequisites/))
-
+```
 ---
 
 ## 🚀 Instalación y Ejecución
