@@ -10,7 +10,7 @@ impl ProductRepository {
     pub async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Product>> {
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE id = ?
             "#,
@@ -24,7 +24,7 @@ impl ProductRepository {
     pub async fn find_by_code(pool: &SqlitePool, code: &str) -> Result<Option<Product>> {
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE code = ?
             "#,
@@ -39,7 +39,7 @@ impl ProductRepository {
         let pattern = format!("%{}%", query);
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE code LIKE ? OR description LIKE ?
             ORDER BY description ASC
@@ -57,7 +57,7 @@ impl ProductRepository {
         let result = sqlx::query(
             r#"
             INSERT INTO products (code, description, price, own_price, variant, category_id, stock, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            VALUES (?, ?, CAST(? AS REAL), ?, CAST(? AS REAL), ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             "#,
         )
         .bind(&dto.code)
@@ -78,7 +78,7 @@ impl ProductRepository {
         let result = sqlx::query(
             r#"
             UPDATE products
-            SET code = ?, description = ?, price = ?, own_price = ?, variant = ?, category_id = ?, stock = ?, updated_at = CURRENT_TIMESTAMP
+            SET code = ?, description = ?, price = CAST(? AS REAL), own_price = ?, variant = CAST(? AS REAL), category_id = ?, stock = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             "#,
         )

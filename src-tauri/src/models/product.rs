@@ -8,7 +8,7 @@ pub struct Product {
     pub description: String,
     pub price: f64,
     pub own_price: Option<String>,
-    pub variant: Option<i64>,
+    pub variant: Option<f64>,
     pub category_id: Option<i64>,
     pub stock: i64,
     pub created_at: String,
@@ -22,7 +22,7 @@ pub struct CreateProductDto {
     pub description: String,
     pub price: f64,
     pub own_price: Option<String>,
-    pub variant: Option<i64>,
+    pub variant: Option<f64>,
     pub category_id: Option<i64>,
     pub stock: i64,
 }
@@ -35,7 +35,7 @@ pub struct UpdateProductDto {
     pub description: String,
     pub price: f64,
     pub own_price: Option<String>,
-    pub variant: Option<i64>,
+    pub variant: Option<f64>,
     pub category_id: Option<i64>,
     pub stock: i64,
 }

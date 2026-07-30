@@ -1,46 +1,32 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
-// @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
 
-// https://vite.dev/config/
-export default defineConfig(async () => ({
-  plugins: [react()],
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
 
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent Vite from obscuring rust errors
+  // Configuración de alias para shadcn/ui
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+
   clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
   server: {
     port: 5173,
     strictPort: true,
     host: host || false,
-    hmr: host
-      ? {
-          protocol: "ws",
-          host,
-          port: 1421,
-        }
-      : undefined,
-    watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
-    },
+    hmr: host ? { protocol: 'ws', host, port: 1421 } : undefined,
+    watch: { ignored: ['**/src-tauri/**'] },
   },
-
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
-
   build: {
-    // Apunta al motor Webview según el sistema operativo de compilación
-    target:
-      process.env.TAURI_ENV_PLATFORM === 'windows'
-        ? 'chrome105'
-        : 'safari13',
-    // No minifica en compilaciones de depuración (debug) para facilitar la lectura
+    target: process.env.TAURI_ENV_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
-    // Genera sourcemaps solo si estás en modo debug
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
-}));
+});
