@@ -14,6 +14,10 @@ export const productApi = {
     return await invoke<Product>('create_product', { dto });
   },
 
+  updateProduct: async (dto: Product): Promise<Product> => {
+    return await invoke<Product>('update_product', { dto });
+  },
+
   deleteProduct: async (id: number): Promise<void> => {
     return await invoke<void>('delete_product', { id });
   },

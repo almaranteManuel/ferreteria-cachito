@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/sidebar';
 import { ModeToggle } from '@/components/mode-toggle';
 
-// Íconos opcionales (podés usar lucide-react o cualquier set de íconos)
 import { 
   Package, 
   ShoppingCart, 
@@ -27,14 +26,15 @@ import {
   Bell 
 } from 'lucide-react';
 
+export type TabType = 'products' | 'sales' | 'customers' | 'billing' | 'suppliers';
+
 interface MainLayoutProps {
   children: React.ReactNode;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
-  // Estado para controlar qué sección está seleccionada
-  const [activeTab, setActiveTab] = useState<'products' | 'sales' | 'customers' | 'billing'>('products');
-
+export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onTabChange }) => {
   return (
     <SidebarProvider defaultOpen={true}>
       <div className="flex min-h-screen w-full bg-slate-50">
@@ -59,11 +59,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <SidebarGroupContent>
                 <SidebarMenu>
                   
-                  {/* Ítem: Productos / Inventario (ACTIVO POR AHORA) */}
+                  {/* Ítem: Productos */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       isActive={activeTab === 'products'}
-                      onClick={() => setActiveTab('products')}
+                      onClick={() => onTabChange('products')}
                       tooltip="Productos"
                     >
                       <Package className="h-4 w-4" />
@@ -71,7 +71,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                  {/* Ítem: Ventas / Mostrador */}
+                  {/* Ítem: Ventas */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       isActive={activeTab === 'sales'}
@@ -83,7 +83,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                  {/* Ítem: Cta. Cte. / Clientes */}
+                  {/* Ítem: Clientes */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       isActive={activeTab === 'customers'}
@@ -95,11 +95,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                  {/* Ítem: Proveedores & Compras */}
+                  {/* Ítem: Proveedores */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
+                      isActive={activeTab === 'suppliers'}
                       tooltip="Proveedores"
-                      onClick={() => alert('Próximamente: Proveedores')}
+                      onClick={() => onTabChange('suppliers')}
                     >
                       <Truck className="h-4 w-4" />
                       <span>Proveedores</span>
@@ -110,44 +111,29 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </SidebarGroupContent>
             </SidebarGroup>
 
+            {/* Resto de grupos del Sidebar... */}
             <SidebarGroup>
               <SidebarGroupLabel>Facturación y Reportes</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  
-                  {/* Ítem: Facturación ARCA */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Facturación ARCA"
-                      onClick={() => alert('Próximamente: Facturación ARCA/AFIP')}
-                    >
+                    <SidebarMenuButton tooltip="Facturación ARCA" onClick={() => alert('Próximamente')}>
                       <Receipt className="h-4 w-4" />
                       <span>Facturación (ARCA)</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-
-                  {/* Ítem: Reportes */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Reportes"
-                      onClick={() => alert('Próximamente: Dashboard de Reportes')}
-                    >
+                    <SidebarMenuButton tooltip="Reportes" onClick={() => alert('Próximamente')}>
                       <BarChart3 className="h-4 w-4" />
                       <span>Reportes</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-
-                  {/* Ítem: Recordatorios */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton
-                      tooltip="Recordatorios"
-                      onClick={() => alert('Próximamente: Recordatorios')}
-                    >
+                    <SidebarMenuButton tooltip="Recordatorios" onClick={() => alert('Próximamente')}>
                       <Bell className="h-4 w-4" />
                       <span>Recordatorios</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -158,31 +144,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </SidebarFooter>
         </Sidebar>
 
-        {/* CONTENIDO PRINCIPAL (HEADER + VISTAS) */}
+        {/* CONTENIDO PRINCIPAL */}
         <SidebarInset className="flex-1 flex flex-col min-w-0">
-          
-          {/* Header Superior del Dashboard */}
           <header className="h-14 border-b border-slate-200 bg-white px-4 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
               <div className="h-4 w-[1px] bg-slate-200" />
               <span className="text-sm font-medium text-slate-600">
                 {activeTab === 'products' && 'Gestión de Inventario'}
+                {activeTab === 'suppliers' && 'Gestión de Proveedores'}
               </span>
             </div>
 
-            {/* Status Indicador de la DB local */}
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block" />
               <span className="text-xs font-medium text-slate-500">Sistema Activo</span>
             </div>
           </header>
 
-          {/* Área de trabajo desplazable */}
           <main className="flex-1 overflow-y-auto">
             {children}
           </main>
-          
         </SidebarInset>
 
       </div>

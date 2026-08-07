@@ -7,3 +7,14 @@ pub struct Category {
     pub created_at: String,
     pub updated_at: String,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct CreateCategoryDto {
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateCategoryDto {
+    pub id: i64,
+    pub name: String,
+}

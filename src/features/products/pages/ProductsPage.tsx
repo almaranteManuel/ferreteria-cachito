@@ -1,29 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useProducts } from '../hooks/useProducts';
+import { Product, CreateProductDto, UpdateProductDto } from '../types';
+import { productApi } from '../api/productApi';
 
-// Componentes de Shadcn UI cargados desde tu directorio local
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ProductTable } from '../components/productTable';
+import { ProductFormDialog } from '../components/productFormDialog';
 
 export const ProductsPage: React.FC = () => {
-  const { products, searchQuery, setSearchQuery, loading, error } = useProducts();
+  const { error, refreshProducts } = useProducts();
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 2,
-    }).format(amount);
+  // Estados para controlar la apertura del modal y la edición
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Abrir modal para Crear
+  const handleOpenCreateModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(true);
+  };
+
+  // Handler enviado al modal para ejecutar la persistencia en SQLite
+  const handleSubmitProduct = async (dto: CreateProductDto | UpdateProductDto) => {
+    if (selectedProduct) {
+      // Edición
+      await productApi.updateProduct({
+        ...selectedProduct,
+        ...dto,
+        id: selectedProduct.id,
+      });
+    } else {
+      // Alta
+      await productApi.createProduct(dto as CreateProductDto);
+    }
+
+    // Refrescar la tabla para actualizar los datos en tiempo real
+    refreshProducts();
   };
 
   return (
@@ -38,29 +50,10 @@ export const ProductsPage: React.FC = () => {
             Gestión de stock y consulta rápida de precios para mostrador
           </p>
         </div>
-        <Button onClick={() => alert('Próximamente: Modal Nuevo Producto')}>
+        <Button onClick={handleOpenCreateModal}>
           + Nuevo Producto
         </Button>
       </div>
-
-      {/* Contenedor Principal / Filtros */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-medium">Buscador Express</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <Input
-              type="text"
-              placeholder="Escanear código de barras o tipear descripción..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              autoFocus
-              className="text-base py-5"
-            />
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Alerta de Error */}
       {error && (
@@ -69,59 +62,16 @@ export const ProductsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tabla Shadcn UI */}
-      <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead className="w-[180px]">Código</TableHead>
-              <TableHead>Descripción</TableHead>
-              <TableHead className="w-[150px]">Precio Venta</TableHead>
-              <TableHead className="w-[120px]">Stock</TableHead>
-              <TableHead className="text-right w-[100px]">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                  Cargando inventario...
-                </TableCell>
-              </TableRow>
-            ) : products.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                  No se encontraron productos coincidentes
-                </TableCell>
-              </TableRow>
-            ) : (
-              products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-slate-50/80">
-                  <TableCell className="font-mono font-semibold text-slate-700">
-                    {product.code}
-                  </TableCell>
-                  <TableCell className="font-medium text-slate-900">
-                    {product.description}
-                  </TableCell>
-                  <TableCell className="font-bold text-emerald-600">
-                    {product.price !== null ? formatCurrency(product.price) : 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={product.stock > 5 ? 'default' : 'destructive'}>
-                      {product.stock} un.
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => alert(`Editar ${product.id}`)}>
-                      Editar
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {/* Tabla de Productos */}
+      <ProductTable />
+
+      {/* Modal para Crear/Editar */}
+      <ProductFormDialog
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        productToEdit={selectedProduct}
+        onSubmit={handleSubmitProduct}
+      />
     </div>
   );
 };
