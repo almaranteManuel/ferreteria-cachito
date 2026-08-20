@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { SuppliersPage } from '@/features/suppliers/pages/SuppliersPage';
 import { MainLayout, TabType } from '../app/layouts/MainLayout';
 import { ProductsPage } from '../features/products/pages/ProductsPage';
+import { SalesPage } from '../features/sales/pages/SalesPage';
+import { CustomersPage } from '../features/customers/pages/CustomersPage';
+import { ReportsPage } from '../features/reports/pages/ReportsPage';
 import { ThemeProvider } from "@/components/theme-provider";
 
 function App() {
@@ -11,7 +14,10 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
         {activeTab === 'products' && <ProductsPage />}
+        {activeTab === 'sales' && <SalesPage />}
+        {activeTab === 'customers' && <CustomersPage />}
         {activeTab === 'suppliers' && <SuppliersPage />}
+        {activeTab === 'reports' && <ReportsPage />}
       </MainLayout>
     </ThemeProvider>
   );

@@ -1,3 +1,9 @@
 pub mod product_repo;
 pub mod supplier_repo;
 pub mod category_repo;
+pub mod purchase_repo;
+pub mod sale_repo;
+pub mod customer_repo;
+pub mod customer_payment_repo;
+pub mod reminder_repo;
+pub mod report_repo;

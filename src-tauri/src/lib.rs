@@ -11,15 +11,13 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            // Inicialización asíncrona de la DB
             let handle = app.handle().clone();
-            
+
             tauri::async_runtime::block_on(async move {
                 let pool = init_database(&handle)
                     .await
                     .expect("Error al inicializar la base de datos");
-                
-                // Guardar el pool en el estado administrado por Tauri
+
                 handle.manage(pool);
             });
 
@@ -42,7 +40,37 @@ pub fn run() {
             commands::category_cmd::get_category_by_id,
             commands::category_cmd::create_category,
             commands::category_cmd::update_category,
-            commands::category_cmd::delete_category
+            commands::category_cmd::delete_category,
+            // Purchase commands
+            commands::purchase_cmd::get_purchase_by_id,
+            commands::purchase_cmd::create_purchase,
+            commands::purchase_cmd::update_purchase,
+            commands::purchase_cmd::delete_purchase,
+            // Sale commands
+            commands::sale_cmd::get_sale_by_id,
+            commands::sale_cmd::list_recent_sales,
+            commands::sale_cmd::create_daily_sale,
+            commands::sale_cmd::create_detailed_sale,
+            commands::sale_cmd::delete_sale,
+            commands::sale_cmd::calc_product_sale_price,
+            // Customer commands
+            commands::customer_cmd::get_customer_by_id,
+            commands::customer_cmd::get_customer_with_payments,
+            commands::customer_cmd::search_customers,
+            commands::customer_cmd::list_customers_with_balance,
+            commands::customer_cmd::create_customer,
+            commands::customer_cmd::update_customer,
+            commands::customer_cmd::add_customer_payment,
+            commands::customer_cmd::add_customer_debt,
+            commands::customer_cmd::delete_customer,
+            // Reminder / supplier debt commands
+            commands::reminder_cmd::list_supplier_debts,
+            commands::reminder_cmd::create_supplier_debt,
+            commands::reminder_cmd::mark_supplier_debt_paid,
+            commands::reminder_cmd::delete_supplier_debt,
+            // Report commands
+            commands::report_cmd::get_yearly_report,
+            commands::report_cmd::get_available_report_years,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

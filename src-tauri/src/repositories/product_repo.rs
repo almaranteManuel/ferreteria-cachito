@@ -96,6 +96,27 @@ impl ProductRepository {
         Ok(result.rows_affected() > 0)
     }
 
+    /// Decrementa stock dentro de una transacción
+    pub async fn decrement_stock(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        product_id: i64,
+        quantity: i64,
+    ) -> Result<bool> {
+        let result = sqlx::query(
+            r#"
+            UPDATE products
+            SET stock = stock - ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND stock >= ?
+            "#,
+        )
+        .bind(quantity)
+        .bind(product_id)
+        .bind(quantity)
+        .execute(&mut **tx)
+        .await?;
+        Ok(result.rows_affected() > 0)
+    }
+
     /// Elimina un producto por su ID
     pub async fn delete(pool: &SqlitePool, id: i64) -> Result<bool> {
         let result = sqlx::query("DELETE FROM products WHERE id = ?")

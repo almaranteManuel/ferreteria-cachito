@@ -26,7 +26,7 @@ import {
   Bell 
 } from 'lucide-react';
 
-export type TabType = 'products' | 'sales' | 'customers' | 'billing' | 'suppliers';
+export type TabType = 'products' | 'sales' | 'customers' | 'billing' | 'suppliers' | 'reports';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -75,7 +75,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       isActive={activeTab === 'sales'}
-                      onClick={() => alert('Próximamente: Módulo de Ventas POS')}
+                      onClick={() => onTabChange('sales')}
                       tooltip="Ventas / Caja"
                     >
                       <ShoppingCart className="h-4 w-4" />
@@ -87,7 +87,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       isActive={activeTab === 'customers'}
-                      onClick={() => alert('Próximamente: Módulo de Clientes')}
+                      onClick={() => onTabChange('customers')}
                       tooltip="Clientes / Fiado"
                     >
                       <Users className="h-4 w-4" />
@@ -123,13 +123,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Reportes" onClick={() => alert('Próximamente')}>
+                    <SidebarMenuButton
+                      isActive={activeTab === 'reports'}
+                      onClick={() => onTabChange('reports')}
+                      tooltip="Reportes"
+                    >
                       <BarChart3 className="h-4 w-4" />
                       <span>Reportes</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Recordatorios" onClick={() => alert('Próximamente')}>
+                    <SidebarMenuButton tooltip="Recordatorios" onClick={() => alert('Usá Clientes & Cta. Cte. → Deudas con proveedores')}>
                       <Bell className="h-4 w-4" />
                       <span>Recordatorios</span>
                     </SidebarMenuButton>
@@ -152,7 +156,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
               <div className="h-4 w-[1px] bg-slate-200" />
               <span className="text-sm font-medium text-slate-600">
                 {activeTab === 'products' && 'Gestión de Inventario'}
+                {activeTab === 'sales' && 'Ventas / Caja'}
+                {activeTab === 'customers' && 'Clientes & Cuenta Corriente'}
                 {activeTab === 'suppliers' && 'Gestión de Proveedores'}
+                {activeTab === 'reports' && 'Reportes de Ventas'}
               </span>
             </div>
 

@@ -8,4 +8,13 @@ pub struct CustomerPayment {
     pub payment_method: String,
     pub note: Option<String>,
     pub date: String,
+    pub transaction_type: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateCustomerPaymentDto {
+    pub customer_id: i64,
+    pub amount: f64,
+    pub payment_method: String,
+    pub note: Option<String>,
 }
