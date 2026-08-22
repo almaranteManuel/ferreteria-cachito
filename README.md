@@ -1,7 +1,7 @@
 <div align="center">
 
   # 🛠️ Cachito ERP
-  **Sistema de Gestión Desktop Local para Ferreterías & Comercio**
+  **Sistema de Gestión Desktop Local para Ferretería Cachito**
 
   [![Tauri](https://img.shields.io/badge/Tauri-v2.0-blue?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app/)
   [![Rust](https://img.shields.io/badge/Rust-Backend-orange?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
