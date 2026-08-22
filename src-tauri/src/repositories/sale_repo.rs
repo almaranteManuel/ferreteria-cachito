@@ -1,11 +1,11 @@
-use crate::models::sale::{CreateDailySaleDto, CreateDetailedSaleDto, Sale, SaleItemDetail};
+use crate::models::sale::{CreateDailySaleDto, Sale, SaleItemDetail};
 use sqlx::{SqlitePool, Result};
 
 pub struct SaleRepository;
 
 impl SaleRepository {
     const SALE_SELECT: &'static str = r#"
-        SELECT id, date, CAST(total_amount AS REAL) AS total_amount,
+        SELECT id, date, CAST(totalAmount AS REAL) AS total_amount,
                payment_method, customer_id, sale_type,
                CAST(is_facturada AS INTEGER) AS is_facturada,
                invoice_type, invoice_number, cae, cae_expiration,
@@ -50,7 +50,7 @@ impl SaleRepository {
     ) -> Result<i64> {
         let result = sqlx::query(
             r#"
-            INSERT INTO sales (date, total_amount, payment_method, sale_type, created_at, updated_at)
+            INSERT INTO sales (date, totalAmount, payment_method, sale_type, created_at, updated_at)
             VALUES (?, CAST(? AS REAL), ?, 'TOTAL_DIA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             "#,
         )
@@ -72,7 +72,7 @@ impl SaleRepository {
     ) -> Result<i64> {
         let result = sqlx::query(
             r#"
-            INSERT INTO sales (date, total_amount, payment_method, customer_id, sale_type, created_at, updated_at)
+            INSERT INTO sales (date, totalAmount, payment_method, customer_id, sale_type, created_at, updated_at)
             VALUES (?, CAST(? AS REAL), ?, ?, 'DETALLADA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             "#,
         )

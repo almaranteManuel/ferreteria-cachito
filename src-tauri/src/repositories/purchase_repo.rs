@@ -6,7 +6,16 @@ pub struct PurchaseRepository;
 impl PurchaseRepository {
     pub async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Purchase>> {
         let purchase = sqlx::query_as::<_, Purchase>(
-            "SELECT * FROM purchases WHERE id = ?",
+            "SELECT
+                id,
+                date,
+                totalAmount AS total_amount,
+                supplier_id,
+                invoice_number,
+                created_at,
+                updated_at
+            FROM purchases
+            WHERE id = ?",
         )
         .bind(id)
         .fetch_optional(pool)
@@ -17,7 +26,7 @@ impl PurchaseRepository {
 
     pub async fn create(pool: &SqlitePool, dto: &CreatePurchaseDto) -> Result<i64> {
         let result = sqlx::query(
-            "INSERT INTO purchases (date, total_amount, supplier_id, invoice_number) VALUES (?, ?, ?, ?)",
+            "INSERT INTO purchases (date, totalAmount, supplier_id, invoice_number) VALUES (?, ?, ?, ?)",
         )
         .bind(&dto.date)
         .bind(dto.total_amount)
@@ -31,7 +40,7 @@ impl PurchaseRepository {
 
     pub async fn update(pool: &SqlitePool, dto: &UpdatePurchaseDto) -> Result<()> {
         sqlx::query(
-            "UPDATE purchases SET date = ?, total_amount = ?, supplier_id = ?, invoice_number = ? WHERE id = ?",
+            "UPDATE purchases SET date = ?, totalAmount = ?, supplier_id = ?, invoice_number = ? WHERE id = ?",
         )
         .bind(&dto.date)
         .bind(dto.total_amount)

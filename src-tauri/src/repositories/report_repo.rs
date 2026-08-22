@@ -12,7 +12,7 @@ impl ReportRepository {
         sqlx::query_as::<_, MonthlyReport>(
             r#"
             SELECT CAST(strftime('%m', date) AS INTEGER) AS month,
-                   CAST(SUM(total_amount) AS REAL) AS total_sales
+                   CAST(SUM(totalAmount) AS REAL) AS total_sales
             FROM sales
             WHERE date LIKE ?
             GROUP BY month
