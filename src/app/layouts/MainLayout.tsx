@@ -83,6 +83,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
+                  {/* Ítem: Facturación */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeTab === 'billing'}
+                      onClick={() => onTabChange('billing')}
+                      tooltip="Facturación electrónica"
+                    >
+                      <Receipt className="h-4 w-4" />
+                      <span>Facturación</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
                   {/* Ítem: Clientes */}
                   <SidebarMenuItem>
                     <SidebarMenuButton

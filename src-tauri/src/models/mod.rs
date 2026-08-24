@@ -8,3 +8,4 @@ pub mod purchase;
 pub mod customer;
 pub mod reminder;
 pub mod report;
+pub mod factura;

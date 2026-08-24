@@ -6,3 +6,4 @@ pub mod sale_service;
 pub mod customer_service;
 pub mod reminder_service;
 pub mod report_service;
+pub mod facturacion_service;

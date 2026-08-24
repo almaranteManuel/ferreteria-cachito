@@ -1,9 +1,11 @@
+pub mod arca;
 pub mod commands;
 pub mod db;
 pub mod models;
 pub mod repositories;
 pub mod services;
 
+use arca::ArcaState;
 use db::connection::init_database;
 use tauri::Manager;
 
@@ -19,11 +21,23 @@ pub fn run() {
                     .expect("Error al inicializar la base de datos");
 
                 handle.manage(pool);
+
+                let arca_state =
+                    ArcaState::new().expect("Error al inicializar el estado ARCA");
+                handle.manage(arca_state);
             });
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            // ARCA commands
+            commands::arca_cmd::estado_config,
+            commands::arca_cmd::wsaa_login,
+            commands::arca_cmd::wsfe_ping,
+            // Facturación commands
+            commands::factura_cmd::emitir_factura,
+            commands::factura_cmd::listar_facturas,
+            commands::factura_cmd::get_factura,
             // Product commands
             commands::product_cmd::get_product_by_id,
             commands::product_cmd::search_products,

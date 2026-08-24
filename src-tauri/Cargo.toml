@@ -34,3 +34,8 @@ thiserror = "1.0"
 # Para manejo de fechas en Rust
 chrono = { version = "0.4", features = ["serde"] }
 
+# ARCA (WSAA/WSFEv1): HTTPS + XML + firma CMS
+openssl = "0.10"
+reqwest = { version = "0.12", default-features = false, features = ["native-tls"] }
+quick-xml = "0.36"
+

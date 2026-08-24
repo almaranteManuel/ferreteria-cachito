@@ -5,6 +5,7 @@ import { ProductsPage } from '../features/products/pages/ProductsPage';
 import { SalesPage } from '../features/sales/pages/SalesPage';
 import { CustomersPage } from '../features/customers/pages/CustomersPage';
 import { ReportsPage } from '../features/reports/pages/ReportsPage';
+import { FacturacionPage } from '@/features/facturacion/pages/FacturacionPage';
 import { ThemeProvider } from "@/components/theme-provider";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         {activeTab === 'products' && <ProductsPage />}
         {activeTab === 'sales' && <SalesPage />}
         {activeTab === 'customers' && <CustomersPage />}
+        {activeTab === 'billing' && <FacturacionPage />}
         {activeTab === 'suppliers' && <SuppliersPage />}
         {activeTab === 'reports' && <ReportsPage />}
       </MainLayout>

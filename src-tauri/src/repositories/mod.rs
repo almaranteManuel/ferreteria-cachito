@@ -7,3 +7,4 @@ pub mod customer_repo;
 pub mod customer_payment_repo;
 pub mod reminder_repo;
 pub mod report_repo;
+pub mod factura_repo;

@@ -128,3 +128,40 @@
     @apply font-sans;
     }
 }
+
+/* ===== Impresión de facturas (A4) ===== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .factura-print-area,
+  .factura-print-area * {
+    visibility: visible !important;
+  }
+
+  .factura-print-area {
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    background: white !important;
+  }
+
+  .factura-print {
+    box-shadow: none !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  /* El fondo oscuro de la app no debe salir en el papel */
+  html, body {
+    background: white !important;
+  }
+}
