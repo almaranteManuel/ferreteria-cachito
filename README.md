@@ -1,6 +1,6 @@
 <div align="center">
 
-  # 🛠️ Cachito ERP
+  # 🛠️ Ferretería Puerto ERP
   **Sistema de Gestión Desktop Local para Ferretería Cachito**
 
   [![Tauri](https://img.shields.io/badge/Tauri-v2.0-blue?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app/)
@@ -30,7 +30,7 @@ A diferencia de los sistemas tradicionales pesados o basados en la nube con susc
 - 💻 **Offline-First:** Persistencia local en SQLite con migraciones automáticas (`sqlx`), ideal para operar sin interrupciones de internet.
 - 🎨 **Interfaz ERP Moderna:** UI profesional construida con `shadcn/ui` y Tailwind CSS v4, optimizada para uso intensivo de teclado.
 - 🚀 **Rendimiento Excepcional:** Consumo mínimo de memoria RAM (~30-50 MB) gracias al motor de Tauri v2.
-- 🧾 **Próximamente - Facturación Integrada:** Módulo de facturación electrónica directa con ARCA / AFIP.
+- 🧾 **Facturación Integrada:** Módulo de facturación electrónica directa con ARCA / AFIP.
 
 ---
 
