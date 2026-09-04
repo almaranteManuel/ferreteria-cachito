@@ -41,4 +41,26 @@ impl ReportRepository {
             .filter_map(|(y,)| y.parse::<i32>().ok())
             .collect())
     }
+
+    pub async fn total_purchases_by_year(pool: &SqlitePool, year: i32) -> Result<f64> {
+        let pattern = format!("{}%", year);
+        let total: Option<f64> = sqlx::query_scalar(
+            "SELECT SUM(CAST(totalAmount AS REAL)) FROM purchases WHERE date LIKE ?",
+        )
+        .bind(pattern)
+        .fetch_one(pool)
+        .await?;
+        Ok(total.unwrap_or(0.0))
+    }
+
+    pub async fn total_expenses_by_year(pool: &SqlitePool, year: i32) -> Result<f64> {
+        let pattern = format!("{}%", year);
+        let total: Option<f64> = sqlx::query_scalar(
+            "SELECT SUM(CAST(monto AS REAL)) FROM gastos_personales WHERE fecha LIKE ?",
+        )
+        .bind(pattern)
+        .fetch_one(pool)
+        .await?;
+        Ok(total.unwrap_or(0.0))
+    }
 }

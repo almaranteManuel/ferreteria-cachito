@@ -1,4 +1,5 @@
 use crate::arca::config::{self, EstadoCredenciales};
+use crate::arca::padron;
 use crate::arca::ArcaState;
 use serde::Serialize;
 use tauri::{AppHandle, State};
@@ -85,4 +86,27 @@ pub async fn wsfe_ping(app: AppHandle) -> Result<WsfePing, String> {
         auth_server: estado.auth_server,
         db_server: estado.db_server,
     })
+}
+
+/// Consulta Padrón A5: datos de un contribuyente por CUIT.
+#[tauri::command]
+pub async fn buscar_persona_arca(
+    app: AppHandle,
+    arca: State<'_, ArcaState>,
+    cuit: u64,
+) -> Result<padron::PersonaArca, String> {
+    let cfg = config::load_or_create(&app).map_err(|e| e.to_string())?;
+    let paths = config::paths(&app).map_err(|e| e.to_string())?;
+
+    let url_wsaa = cfg.ambiente.wsaa_url().map_err(|e| e.to_string())?;
+    let url_padron = cfg.ambiente.padron_url().map_err(|e| e.to_string())?;
+
+    let ta = arca
+        .ta_valido(&paths, url_wsaa, padron::SERVICIO_PADRON_A5)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    padron::buscar_persona(&arca.cliente, url_padron, &ta, cfg.cuit, cuit)
+        .await
+        .map_err(|e| e.to_string())
 }

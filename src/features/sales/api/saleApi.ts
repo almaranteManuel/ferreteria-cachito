@@ -11,6 +11,10 @@ export const saleApi = {
     return await invoke<Sale[]>('list_recent_sales', { limit });
   },
 
+  listSalesByDateRange: async (start: string, end: string): Promise<Sale[]> => {
+    return await invoke<Sale[]>('list_sales_by_date_range', { start, end });
+  },
+
   getSaleById: async (id: number): Promise<SaleWithItems> => {
     return await invoke<SaleWithItems>('get_sale_by_id', { id });
   },

@@ -70,7 +70,7 @@ export const ReportsPage: React.FC = () => {
 
       {report && !loading && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-slate-500">Total vendido {year}</CardTitle>
@@ -93,6 +93,22 @@ export const ReportsPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold text-amber-600">{formatCurrency(report.total_restocking)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-slate-500">Compras a proveedores</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(report.total_purchases)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-slate-500">Gastos personales e impuestos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-rose-600">{formatCurrency(report.total_expenses)}</p>
               </CardContent>
             </Card>
           </div>

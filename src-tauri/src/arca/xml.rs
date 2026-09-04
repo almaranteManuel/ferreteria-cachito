@@ -154,7 +154,11 @@ pub fn extraer_observaciones(xml: &str) -> Vec<(i64, String)> {
 /// manualmente: uniqueId = epoch segundos, fechas con offset local.
 pub fn build_login_ticket_request(service: &str) -> ArcaResult<String> {
     let service = service.trim();
-    if service.is_empty() || !service.chars().all(|c| c.is_ascii_alphanumeric()) {
+    if service.is_empty()
+        || !service
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_')
+    {
         return Err(ArcaError::Config(format!(
             "Nombre de servicio inválido para LoginTicketRequest: '{service}'"
         )));
@@ -228,10 +232,13 @@ mod tests {
     }
 
     #[test]
-    fn ltr_rechaza_service_invalido() {
+    fn ltr_rechaza_service_invalido_acepta_underscore() {
         assert!(build_login_ticket_request("").is_err());
         assert!(build_login_ticket_request("ws fe").is_err());
         assert!(build_login_ticket_request("<x/>").is_err());
+        // Los servicios reales de ARCA usan guiones bajos.
+        assert!(build_login_ticket_request("ws_sr_padron_a5").is_ok());
+        assert!(build_login_ticket_request("wsfe").is_ok());
     }
 
     #[test]

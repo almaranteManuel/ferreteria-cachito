@@ -7,7 +7,8 @@ impl FacturaRepository {
     const FACTURA_SELECT: &'static str = r#"
         SELECT id, fecha, tipo, punto_venta, numero,
                CAST(total AS REAL) AS total, cae, cae_expiration,
-               resultado, cliente_nombre, created_at
+               resultado, cliente_nombre, cliente_cuit,
+               condicion_iva_receptor_id, created_at
         FROM facturas
     "#;
 
@@ -72,6 +73,7 @@ impl FacturaRepository {
     }
 
     /// Inserta factura + ítems en una transacción y devuelve el id.
+    #[allow(clippy::too_many_arguments)]
     pub async fn create_with_items(
         pool: &SqlitePool,
         fecha: &str,
@@ -90,8 +92,9 @@ impl FacturaRepository {
             r#"
             INSERT INTO facturas
                 (fecha, tipo, punto_venta, numero, total,
-                 cae, cae_expiration, resultado, cliente_nombre, created_at)
-            VALUES (?, ?, ?, ?, CAST(? AS REAL), ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                 cae, cae_expiration, resultado, cliente_nombre,
+                 cliente_cuit, condicion_iva_receptor_id, created_at)
+            VALUES (?, ?, ?, ?, CAST(? AS REAL), ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             "#,
         )
         .bind(fecha)
@@ -103,6 +106,8 @@ impl FacturaRepository {
         .bind(cae_expiration)
         .bind(resultado)
         .bind(&dto.cliente_nombre)
+        .bind(dto.cliente_cuit.map(|c| c.to_string()))
+        .bind(dto.condicion_iva_receptor_id.map(|c| c as i64))
         .execute(&mut *tx)
         .await?;
 
@@ -154,6 +159,8 @@ mod tests {
     fn dto_ejemplo() -> CreateFacturaDto {
         CreateFacturaDto {
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
             items: vec![
                 CreateFacturaItemDto {
                     descripcion: "Tornillo autoperforante".into(),

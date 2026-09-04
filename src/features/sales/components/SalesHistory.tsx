@@ -4,20 +4,73 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 
 export const SalesHistory: React.FC = () => {
-  const { sales, loading, error } = useSales();
+  const { sales, loading, error, dateRange, setDateRange, deleteSale } = useSales();
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const cleanDate = dateStr.split('T')[0].split(' ')[0];
+    const parts = cleanDate.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      return `${day}/${month}/${year}`;
+    }
+    return dateStr;
+  };
+
+  const handleDelete = async (saleId: number) => {
+    if (!confirm('¿Eliminar esta venta?')) return;
+    await deleteSale(saleId);
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-base">Ventas recientes</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="flex gap-4 items-end">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-muted-foreground">Desde</label>
+            <Input
+              type="date"
+              value={dateRange?.start ?? ''}
+              onChange={(e) => {
+                const start = e.target.value;
+                const end = dateRange?.end ?? '';
+                setDateRange(start && end ? { start, end } : null);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-muted-foreground">Hasta</label>
+            <Input
+              type="date"
+              value={dateRange?.end ?? ''}
+              onChange={(e) => {
+                const end = e.target.value;
+                const start = dateRange?.start ?? '';
+                setDateRange(start && end ? { start, end } : null);
+              }}
+            />
+          </div>
+          {dateRange && (
+            <button
+              onClick={() => setDateRange(null)}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
+
         {loading ? (
           <p className="text-sm text-slate-500">Cargando...</p>
         ) : error ? (
@@ -25,32 +78,37 @@ export const SalesHistory: React.FC = () => {
         ) : sales.length === 0 ? (
           <p className="text-sm text-slate-500">No hay ventas registradas</p>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Pago</TableHead>
-                <TableHead className="text-right">Monto</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sales.map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>{sale.date}</TableCell>
-                  <TableCell>
-                    <Badge variant={sale.sale_type === 'TOTAL_DIA' ? 'secondary' : 'default'}>
-                      {sale.sale_type === 'TOTAL_DIA' ? 'Total día' : 'Detallada'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{sale.payment_method}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatCurrency(sale.total_amount)}
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead className="text-right">Monto</TableHead>
+                  <TableHead className="text-right w-[60px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {sales.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell>{formatDate(sale.date)}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatCurrency(sale.total_amount)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-destructive hover:text-destructive"
+                        onClick={() => handleDelete(sale.id)}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -8,3 +8,5 @@ pub mod customer_payment_repo;
 pub mod reminder_repo;
 pub mod report_repo;
 pub mod factura_repo;
+pub mod presupuesto_repo;
+pub mod gasto_personal_repo;

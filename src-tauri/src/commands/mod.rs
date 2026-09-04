@@ -8,3 +8,5 @@ pub mod sale_cmd;
 pub mod customer_cmd;
 pub mod reminder_cmd;
 pub mod report_cmd;
+pub mod presupuesto_cmd;
+pub mod gasto_personal_cmd;

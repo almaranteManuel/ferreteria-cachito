@@ -34,6 +34,7 @@ pub fn run() {
             commands::arca_cmd::estado_config,
             commands::arca_cmd::wsaa_login,
             commands::arca_cmd::wsfe_ping,
+            commands::arca_cmd::buscar_persona_arca,
             // Facturación commands
             commands::factura_cmd::emitir_factura,
             commands::factura_cmd::listar_facturas,
@@ -60,9 +61,11 @@ pub fn run() {
             commands::purchase_cmd::create_purchase,
             commands::purchase_cmd::update_purchase,
             commands::purchase_cmd::delete_purchase,
+            commands::purchase_cmd::list_recent_purchases,
             // Sale commands
             commands::sale_cmd::get_sale_by_id,
             commands::sale_cmd::list_recent_sales,
+            commands::sale_cmd::list_sales_by_date_range,
             commands::sale_cmd::create_daily_sale,
             commands::sale_cmd::create_detailed_sale,
             commands::sale_cmd::delete_sale,
@@ -85,6 +88,15 @@ pub fn run() {
             // Report commands
             commands::report_cmd::get_yearly_report,
             commands::report_cmd::get_available_report_years,
+            // Presupuesto commands
+            commands::presupuesto_cmd::crear_presupuesto,
+            commands::presupuesto_cmd::listar_presupuestos,
+            commands::presupuesto_cmd::get_presupuesto,
+            commands::presupuesto_cmd::eliminar_presupuesto,
+            // Gastos personales commands
+            commands::gasto_personal_cmd::crear_gasto_personal,
+            commands::gasto_personal_cmd::listar_gastos_personales,
+            commands::gasto_personal_cmd::eliminar_gasto_personal,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

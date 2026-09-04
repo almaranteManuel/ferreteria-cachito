@@ -126,7 +126,6 @@ export const SupplierDebtsTab: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [supplierId, setSupplierId] = useState('');
   const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
@@ -149,18 +148,19 @@ export const SupplierDebtsTab: React.FC = () => {
   const handleCreate = async () => {
     const parsedAmount = parseFloat(amount);
     if (!title.trim() || !parsedAmount || parsedAmount <= 0) return;
+    // La tabla real no tiene `title` ni `due_date`; `title` se guarda en `description`
+    // y `description` (detalle) se concatena si existe.
     await customerApi.createSupplierDebt({
-      title,
+      title: title.trim(),
       amount: parsedAmount,
       supplier_id: supplierId ? parseInt(supplierId, 10) : null,
-      description: description || null,
-      due_date: dueDate || null,
+      description: description.trim() || null,
+      due_date: null,
     });
     setTitle('');
     setAmount('');
     setSupplierId('');
     setDescription('');
-    setDueDate('');
     setShowCreate(false);
     loadDebts();
   };
@@ -180,18 +180,19 @@ export const SupplierDebtsTab: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Registrar deuda con proveedor</CardTitle>
+            <p className="text-xs text-muted-foreground">Tu tabla `reminders` no tiene `title` ni `vencimiento`; la descripción se guarda en `description`.</p>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Título *</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Deuda Ferretería XYZ" />
+                <Label>Descripción *</Label>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Deuda Ferretería XYZ - 10 bolsas cemento" />
               </div>
               <div className="space-y-2">
                 <Label>Monto ($) *</Label>
                 <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-2">
                 <Label>Proveedor</Label>
                 <select
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
@@ -204,14 +205,10 @@ export const SupplierDebtsTab: React.FC = () => {
                   ))}
                 </select>
               </div>
-              <div className="space-y-2">
-                <Label>Vencimiento</Label>
-                <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-              </div>
             </div>
             <div className="space-y-2">
-              <Label>Descripción</Label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+              <Label>Detalle (opcional)</Label>
+              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Se concatena a la descripción si lo completás" />
             </div>
             <Button onClick={handleCreate}>Guardar deuda</Button>
           </CardContent>
@@ -228,9 +225,8 @@ export const SupplierDebtsTab: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Título</TableHead>
+                  <TableHead>Descripción</TableHead>
                   <TableHead>Proveedor</TableHead>
-                  <TableHead>Vencimiento</TableHead>
                   <TableHead className="text-right">Monto</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
@@ -238,9 +234,8 @@ export const SupplierDebtsTab: React.FC = () => {
               <TableBody>
                 {debts.map((d) => (
                   <TableRow key={d.id}>
-                    <TableCell>{d.title}</TableCell>
+                    <TableCell className="max-w-[360px] truncate" title={d.title}>{d.title}</TableCell>
                     <TableCell>{d.supplier_name || '—'}</TableCell>
-                    <TableCell>{d.due_date?.slice(0, 10) || '—'}</TableCell>
                     <TableCell className="text-right font-medium">
                       {d.amount != null ? formatCurrency(d.amount) : '—'}
                     </TableCell>

@@ -12,6 +12,8 @@ pub struct Factura {
     pub cae_expiration: Option<String>,
     pub resultado: String,
     pub cliente_nombre: Option<String>,
+    pub cliente_cuit: Option<String>,
+    pub condicion_iva_receptor_id: Option<i64>,
     pub created_at: String,
 }
 
@@ -44,4 +46,8 @@ pub struct CreateFacturaItemDto {
 pub struct CreateFacturaDto {
     pub items: Vec<CreateFacturaItemDto>,
     pub cliente_nombre: Option<String>,
+    /// Si está presente, la factura se emite con DocTipo 80 (CUIT).
+    pub cliente_cuit: Option<u64>,
+    /// CondicionIVAReceptorId obtenido del Padrón A5 (obligatorio si hay CUIT).
+    pub condicion_iva_receptor_id: Option<u8>,
 }

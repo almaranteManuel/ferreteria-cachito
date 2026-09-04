@@ -34,3 +34,11 @@ pub async fn delete_purchase(
 ) -> Result<(), String> {
     PurchaseService::delete_purchase(pool.inner(), id).await
 }
+
+#[tauri::command]
+pub async fn list_recent_purchases(
+    pool: State<'_, SqlitePool>,
+    limit: Option<i64>,
+) -> Result<Vec<Purchase>, String> {
+    PurchaseService::list_recent_purchases(pool.inner(), limit.unwrap_or(50)).await
+}

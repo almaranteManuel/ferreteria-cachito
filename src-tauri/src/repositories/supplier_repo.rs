@@ -58,7 +58,7 @@ impl SupplierRepository {
         sqlx::query(
             r#"
             UPDATE suppliers
-            SET name = ?, contact_info = ?, updated_at = CURRENT_TIMESTAMP
+            SET name = ?, email = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             "#,
         )

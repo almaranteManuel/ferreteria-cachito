@@ -22,11 +22,12 @@ import {
   Users, 
   Truck, 
   Receipt, 
-  BarChart3, 
-  Bell 
+  BarChart3,
+  FileText,
+  Wallet
 } from 'lucide-react';
 
-export type TabType = 'products' | 'sales' | 'customers' | 'billing' | 'suppliers' | 'reports';
+export type TabType = 'products' | 'sales' | 'customers' | 'billing' | 'suppliers' | 'reports' | 'presupuestos' | 'expenses';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -58,6 +59,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
               <SidebarGroupLabel>Módulos Principales</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
+                  {/* Ítem: Reportes */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      isActive={activeTab === 'reports'}
+                      onClick={() => onTabChange('reports')}
+                      tooltip="Reportes"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Reportes</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                   
                   {/* Ítem: Productos */}
                   <SidebarMenuItem>
@@ -119,37 +131,30 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-
-            {/* Resto de grupos del Sidebar... */}
-            <SidebarGroup>
-              <SidebarGroupLabel>Facturación y Reportes</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Facturación ARCA" onClick={() => alert('Próximamente')}>
-                      <Receipt className="h-4 w-4" />
-                      <span>Facturación (ARCA)</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {/* Ítem: Compras & Gastos */}
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      isActive={activeTab === 'reports'}
-                      onClick={() => onTabChange('reports')}
-                      tooltip="Reportes"
+                      isActive={activeTab === 'expenses'}
+                      tooltip="Compras & Gastos"
+                      onClick={() => onTabChange('expenses')}
                     >
-                      <BarChart3 className="h-4 w-4" />
-                      <span>Reportes</span>
+                      <Wallet className="h-4 w-4" />
+                      <span>Compras & Gastos</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
+                  {/* Ítem: Presupuestos */}
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="Recordatorios" onClick={() => alert('Usá Clientes & Cta. Cte. → Deudas con proveedores')}>
-                      <Bell className="h-4 w-4" />
-                      <span>Recordatorios</span>
+                    <SidebarMenuButton
+                      isActive={activeTab === 'presupuestos'}
+                      tooltip="Presupuestos"
+                      onClick={() => onTabChange('presupuestos')}
+                    >
+                      <FileText className="h-4 w-4" />
+                      <span>Presupuestos</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
@@ -171,7 +176,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, onT
                 {activeTab === 'sales' && 'Ventas / Caja'}
                 {activeTab === 'customers' && 'Clientes & Cuenta Corriente'}
                 {activeTab === 'suppliers' && 'Gestión de Proveedores'}
-                {activeTab === 'reports' && 'Reportes de Ventas'}
+                {activeTab === 'reports' && 'Reportes'}
+                {activeTab === 'billing' && 'Facturación'}
+                {activeTab === 'expenses' && 'Compras & Gastos'}
+                {activeTab === 'presupuestos' && 'Presupuestos'}
               </span>
             </div>
 

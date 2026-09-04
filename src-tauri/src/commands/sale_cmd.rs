@@ -22,6 +22,15 @@ pub async fn list_recent_sales(
 }
 
 #[tauri::command]
+pub async fn list_sales_by_date_range(
+    pool: State<'_, SqlitePool>,
+    start: String,
+    end: String,
+) -> Result<Vec<Sale>, String> {
+    SaleService::list_sales_by_date_range(pool.inner(), &start, &end).await
+}
+
+#[tauri::command]
 pub async fn create_daily_sale(
     pool: State<'_, SqlitePool>,
     dto: CreateDailySaleDto,

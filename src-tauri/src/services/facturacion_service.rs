@@ -60,6 +60,23 @@ impl FacturacionService {
     ) -> Result<FacturaWithItems, String> {
         Self::validar_dto(&dto)?;
 
+        // Receptor identificado: CUIT y condición IVA van juntos.
+        let condicion_receptor = match dto.cliente_cuit {
+            Some(cuit) => {
+                let c = dto
+                    .condicion_iva_receptor_id
+                    .ok_or_else(|| "Falta la condición IVA del cliente (buscá el CUIT primero)".to_string())?;
+                if !(1..=20).contains(&c) {
+                    return Err(format!("Condición IVA inválida: {c}"));
+                }
+                if !(10_000_000_000..=99_999_999_999).contains(&cuit) {
+                    return Err(format!("CUIT del cliente inválido: {cuit}"));
+                }
+                Some((80u16, cuit, c))
+            }
+            None => None,
+        };
+
         let cfg = config::load_or_create(app).map_err(|e| e.to_string())?;
         let paths = config::paths(app).map_err(|e| e.to_string())?;
         let url_wsaa = cfg.ambiente.wsaa_url().map_err(|e| e.to_string())?;
@@ -94,13 +111,20 @@ impl FacturacionService {
         };
 
         let hoy = Local::now();
-        let params = FacturaCParams {
+        let mut params = FacturaCParams {
             pto_vta: punto_venta as u32,
             numero,
             imp_total: Self::calcular_total(&dto),
             imp_neto: Self::calcular_total(&dto),
             fecha: hoy.format("%Y%m%d").to_string(),
+            ..Default::default()
         };
+
+        if let Some((doc_tipo, doc_nro, cond)) = condicion_receptor {
+            params.doc_tipo = doc_tipo;
+            params.doc_nro = doc_nro;
+            params.condicion_iva_receptor_id = cond;
+        }
 
         let respuesta = wsfe::fe_cae_solicitar_factura_c(
             &arca.cliente,
@@ -196,6 +220,8 @@ mod tests {
         let dto = CreateFacturaDto {
             items: vec![],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_err());
     }
@@ -205,6 +231,8 @@ mod tests {
         let dto = CreateFacturaDto {
             items: vec![item("   ", 1.0, 100.0)],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_err());
     }
@@ -214,18 +242,24 @@ mod tests {
         let dto = CreateFacturaDto {
             items: vec![item("Tornillos", 0.0, 100.0)],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_err());
 
         let dto = CreateFacturaDto {
             items: vec![item("Tornillos", 2.0, -5.0)],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_err());
 
         let dto = CreateFacturaDto {
             items: vec![item("Tornillos", 3.0, 0.0)],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_err());
     }
@@ -235,6 +269,8 @@ mod tests {
         let dto = CreateFacturaDto {
             items: vec![item("Tornillos", 10.0, 2.5), item("Cable x metro", 2.5, 500.0)],
             cliente_nombre: None,
+            cliente_cuit: None,
+            condicion_iva_receptor_id: None,
         };
         assert!(FacturacionService::validar_dto(&dto).is_ok());
         let total = FacturacionService::calcular_total(&dto);

@@ -32,6 +32,22 @@ impl SaleRepository {
             .await
     }
 
+    pub async fn list_by_date_range(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<Sale>> {
+        let query = format!(
+            "{} WHERE date >= ? AND date <= ? ORDER BY date DESC, id DESC",
+            Self::SALE_SELECT
+        );
+        sqlx::query_as::<_, Sale>(&query)
+            .bind(start)
+            .bind(end)
+            .fetch_all(pool)
+            .await
+    }
+
     pub async fn list_by_year(pool: &SqlitePool, year: i32) -> Result<Vec<Sale>> {
         let pattern = format!("{}%", year);
         let query = format!(

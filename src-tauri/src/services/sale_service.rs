@@ -34,6 +34,16 @@ impl SaleService {
             .map_err(|e| format!("Error al listar ventas: {}", e))
     }
 
+    pub async fn list_sales_by_date_range(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<Sale>, String> {
+        SaleRepository::list_by_date_range(pool, start, end)
+            .await
+            .map_err(|e| format!("Error al listar ventas por rango de fechas: {}", e))
+    }
+
     pub async fn create_daily_sale(
         pool: &SqlitePool,
         dto: CreateDailySaleDto,

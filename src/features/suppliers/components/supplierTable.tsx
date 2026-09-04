@@ -1,32 +1,28 @@
 import React from 'react';
 import { useSuppliers } from '../hooks/useSuppliers';
+import { Supplier } from '../types';
 
-// Componentes de Shadcn UI cargados desde tu directorio local
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Pencil, Trash2 } from 'lucide-react';
 
-export const SupplierTable: React.FC = () => {
+interface SupplierTableProps {
+  onEdit: (supplier: Supplier) => void;
+  onDelete: (supplier: Supplier) => void;
+}
+
+export const SupplierTable: React.FC<SupplierTableProps> = ({ onEdit, onDelete }) => {
   const { suppliers, searchQuery, setSearchQuery, loading, error } = useSuppliers();
 
     return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
-      {/* Header del Módulo */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Gestión de Proveedores
-          </h1>
-        </div>
-      </div>
-
-        {/* Contenedor Principal / Filtros */}
+    <>
         <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-medium">Buscador Express</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
             <Input
                 type="text"
                 placeholder="Buscar proveedor por nombre..."
@@ -35,16 +31,14 @@ export const SupplierTable: React.FC = () => {
                 autoFocus
                 className="text-base py-5"
             />
-          </div>
         </CardContent>
       </Card>
 
-        {/* Tabla de Proveedores */}
         <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-medium">Listado de Proveedores</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           {loading ? (
             <p>Cargando proveedores...</p>
           ) : error ? (
@@ -59,15 +53,36 @@ export const SupplierTable: React.FC = () => {
                         <TableHead>Email de Contacto</TableHead>
                         <TableHead>Teléfono de Contacto</TableHead>
                         <TableHead>Dirección</TableHead>
+                        <TableHead className="text-right w-[100px]">Acciones</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {suppliers.map((supplier) => (
                         <TableRow key={supplier.id}>
                             <TableCell>{supplier.name}</TableCell>
-                            <TableCell>{supplier.contact_email || 'No disponible'}</TableCell>
-                            <TableCell>{supplier.contact_phone || 'No disponible'}</TableCell>
-                            <TableCell>{supplier.address || 'No disponible'}</TableCell>
+                            <TableCell>{supplier.email || '—'}</TableCell>
+                            <TableCell>{supplier.phone || '—'}</TableCell>
+                            <TableCell>{supplier.address || '—'}</TableCell>
+                            <TableCell className="text-right">
+                                <div className="flex justify-end gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="size-8"
+                                        onClick={() => onEdit(supplier)}
+                                    >
+                                        <Pencil className="size-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="size-8 text-destructive hover:text-destructive"
+                                        onClick={() => onDelete(supplier)}
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </Button>
+                                </div>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -75,6 +90,6 @@ export const SupplierTable: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 };

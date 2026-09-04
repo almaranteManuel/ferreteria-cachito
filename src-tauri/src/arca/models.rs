@@ -97,6 +97,26 @@ pub struct FacturaCParams {
     pub imp_neto: f64,
     /// YYYYMMDD
     pub fecha: String,
+    /// 99 = Consumidor Final (sin identificar), 80 = CUIT.
+    pub doc_tipo: u16,
+    pub doc_nro: u64,
+    /// CondicionIVAReceptorId: 5 CF, 1 inscripto, 6 monotributo, 4 exento.
+    pub condicion_iva_receptor_id: u8,
+}
+
+impl Default for FacturaCParams {
+    fn default() -> Self {
+        Self {
+            pto_vta: 10,
+            numero: 0,
+            imp_total: 0.0,
+            imp_neto: 0.0,
+            fecha: String::new(),
+            doc_tipo: 99,
+            doc_nro: 0,
+            condicion_iva_receptor_id: 5,
+        }
+    }
 }
 
 /// Resultado de FECAESolicitar para un comprobante.

@@ -38,6 +38,17 @@ impl Ambiente {
             )),
         }
     }
+
+    pub fn padron_url(&self) -> ArcaResult<&'static str> {
+        match self {
+            Ambiente::Homologacion => {
+                Ok("https://awshomo.afip.gov.ar/sr-padron/webservices/personaServiceA5")
+            }
+            Ambiente::Produccion => Err(ArcaError::Config(
+                "Producción no habilitada todavía: falta migración explícita".into(),
+            )),
+        }
+    }
 }
 
 impl std::fmt::Display for Ambiente {

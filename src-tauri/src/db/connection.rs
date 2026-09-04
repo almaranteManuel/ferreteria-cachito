@@ -44,6 +44,7 @@ pub async fn init_database(app_handle: &AppHandle) -> Result<SqlitePool, Box<dyn
         .await?;
 
     println!("Conexión a SQLite y migraciones exitosas.");
+    println!("DB que está usando la app: {:?}", db_path);
 
     Ok(pool)
 }

@@ -10,7 +10,7 @@ impl ProductRepository {
     pub async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Product>> {
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, CAST(variant AS REAL) AS variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE id = ?
             "#,
@@ -24,7 +24,7 @@ impl ProductRepository {
     pub async fn find_by_code(pool: &SqlitePool, code: &str) -> Result<Option<Product>> {
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, CAST(variant AS REAL) AS variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE code = ?
             "#,
@@ -39,7 +39,7 @@ impl ProductRepository {
         let pattern = format!("%{}%", query);
         sqlx::query_as::<_, Product>(
             r#"
-            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, variant, category_id, stock, created_at, updated_at
+            SELECT id, code, description, CAST(price AS REAL) AS price, own_price, CAST(variant AS REAL) AS variant, category_id, stock, created_at, updated_at
             FROM products
             WHERE code LIKE ? OR description LIKE ?
             ORDER BY description ASC

@@ -47,4 +47,10 @@ impl PurchaseService {
             Err(e) => Err(format!("Error al eliminar la compra: {}", e)),
         }
     }
+
+    pub async fn list_recent_purchases(pool: &SqlitePool, limit: i64) -> Result<Vec<Purchase>, String> {
+        PurchaseRepository::list_recent(pool, limit)
+            .await
+            .map_err(|e| format!("Error al listar compras: {}", e))
+    }
 }

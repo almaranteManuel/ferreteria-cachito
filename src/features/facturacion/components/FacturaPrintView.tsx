@@ -4,16 +4,26 @@ import {
   FacturaWithItems,
   formatearNumeroFactura,
 } from '../types';
-import logoUrl from '@/assets/logo-ferreteria.png';
+import logoUrl from '@/assets/puerto-logo.jpeg';
 
 interface FacturaPrintViewProps {
   factura: FacturaWithItems;
 }
 
+const CONDICIONES_IVA: Record<number, string> = {
+  1: 'IVA Responsable Inscripto',
+  4: 'IVA Sujeto Exento',
+  5: 'Consumidor Final',
+  6: 'Responsable Monotributo',
+};
+
+function descripcionCondicionIva(id: number): string {
+  return CONDICIONES_IVA[id] ?? `Código ${id}`;
+}
+
 /**
  * Plantilla A4 del comprobante. En pantalla se ve dentro de un contenedor;
  * al imprimir (@media print) es lo único visible.
- * Reemplazá src/assets/logo-ferreteria.png por el logo real cuando lo tengas.
  */
 export const FacturaPrintView: React.FC<FacturaPrintViewProps> = ({ factura }) => {
   const fechaLarga = new Date(factura.fecha + 'T12:00:00').toLocaleDateString('es-AR', {
@@ -58,10 +68,28 @@ export const FacturaPrintView: React.FC<FacturaPrintViewProps> = ({ factura }) =
 
       {/* Cliente */}
       <div className="mt-4 py-2 border-b border-gray-400">
-        <p className="text-xs">
-          <span className="font-semibold">Cliente:</span>{' '}
-          {factura.cliente_nombre || 'Consumidor Final'}
-        </p>
+        {factura.cliente_cuit ? (
+          <div className="text-xs space-y-0.5">
+            <p>
+              <span className="font-semibold">Cliente:</span>{' '}
+              {factura.cliente_nombre || '—'}
+            </p>
+            <p>
+              <span className="font-semibold">CUIT:</span> {factura.cliente_cuit}
+              {factura.condicion_iva_receptor_id != null && (
+                <>
+                  {' · '}
+                  <span className="font-semibold">Condición IVA:</span>{' '}
+                  {descripcionCondicionIva(factura.condicion_iva_receptor_id)}
+                </>
+              )}
+            </p>
+          </div>
+        ) : (
+          <p className="text-xs">
+            <span className="font-semibold">Cliente:</span> Consumidor Final
+          </p>
+        )}
       </div>
 
       {/* Ítems */}

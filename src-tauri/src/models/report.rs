@@ -22,6 +22,8 @@ pub struct YearlyReport {
     pub total_sales: f64,
     pub total_profit: f64,
     pub total_restocking: f64,
+    pub total_purchases: f64,
+    pub total_expenses: f64,
 }
 
 const MONTH_NAMES: [&str; 12] = [
@@ -51,6 +53,18 @@ pub fn build_yearly_report(year: i32, rows: Vec<MonthlyReport>) -> YearlyReport 
         total_profit: total_sales * 0.4,
         total_restocking: total_sales * 0.6,
         total_sales,
+        total_purchases: 0.0,
+        total_expenses: 0.0,
         months,
     }
+}
+
+pub fn with_totals_purchases_expenses(
+    mut report: YearlyReport,
+    total_purchases: f64,
+    total_expenses: f64,
+) -> YearlyReport {
+    report.total_purchases = total_purchases;
+    report.total_expenses = total_expenses;
+    report
 }

@@ -9,3 +9,5 @@ pub mod customer;
 pub mod reminder;
 pub mod report;
 pub mod factura;
+pub mod presupuesto;
+pub mod gasto_personal;

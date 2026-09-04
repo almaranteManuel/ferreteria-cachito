@@ -12,4 +12,6 @@ export interface YearlyReport {
   total_sales: number;
   total_profit: number;
   total_restocking: number;
+  total_purchases: number;
+  total_expenses: number;
 }

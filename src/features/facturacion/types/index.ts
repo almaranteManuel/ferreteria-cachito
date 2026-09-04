@@ -9,6 +9,8 @@ export interface Factura {
   cae_expiration: string | null;
   resultado: 'PENDIENTE' | 'A' | 'O' | 'R';
   cliente_nombre: string | null;
+  cliente_cuit: string | null;
+  condicion_iva_receptor_id: number | null;
   created_at: string;
 }
 
@@ -35,6 +37,21 @@ export interface CreateFacturaItemDto {
 export interface CreateFacturaDto {
   items: CreateFacturaItemDto[];
   cliente_nombre?: string | null;
+  /** Si está presente, se emite con DocTipo 80 (CUIT). */
+  cliente_cuit?: number | null;
+  /** CondicionIVAReceptorId del Padrón A5 (obligatorio si hay CUIT). */
+  condicion_iva_receptor_id?: number | null;
+}
+
+/** Datos que devuelve el Padrón A5 de ARCA para un CUIT. */
+export interface PersonaArca {
+  cuit: number;
+  denominacion: string;
+  tipo_persona: string;
+  estado: string;
+  condicion_iva_receptor_id: number;
+  condicion_iva_desc: string;
+  domicilio: string | null;
 }
 
 /** Ítem del carrito de la pantalla de facturación. */

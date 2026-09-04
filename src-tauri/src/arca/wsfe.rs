@@ -144,8 +144,8 @@ pub fn build_fe_cae_solicitar_factura_c(
                 <ar:FeDetReq>
                     <ar:FECAEDetRequest>
                         <ar:Concepto>1</ar:Concepto>
-                        <ar:DocTipo>99</ar:DocTipo>
-                        <ar:DocNro>0</ar:DocNro>
+                        <ar:DocTipo>{doc_tipo}</ar:DocTipo>
+                        <ar:DocNro>{doc_nro}</ar:DocNro>
                         <ar:CbteDesde>{nro}</ar:CbteDesde>
                         <ar:CbteHasta>{nro}</ar:CbteHasta>
                         <ar:CbteFch>{fecha}</ar:CbteFch>
@@ -157,7 +157,7 @@ pub fn build_fe_cae_solicitar_factura_c(
                         <ar:ImpTrib>0.00</ar:ImpTrib>
                         <ar:MonId>PES</ar:MonId>
                         <ar:MonCotiz>1.00</ar:MonCotiz>
-                        <ar:CondicionIVAReceptorId>5</ar:CondicionIVAReceptorId>
+                        <ar:CondicionIVAReceptorId>{cond_iva}</ar:CondicionIVAReceptorId>
                     </ar:FECAEDetRequest>
                 </ar:FeDetReq>
             </ar:FeCAEReq>
@@ -172,7 +172,10 @@ pub fn build_fe_cae_solicitar_factura_c(
         nro = p.numero,
         fecha = p.fecha,
         total = p.imp_total,
-        neto = p.imp_neto
+        neto = p.imp_neto,
+        doc_tipo = p.doc_tipo,
+        doc_nro = p.doc_nro,
+        cond_iva = p.condicion_iva_receptor_id
     )
 }
 
@@ -370,6 +373,7 @@ mod tests {
             imp_total: 100.0,
             imp_neto: 100.0,
             fecha: chrono::Local::now().format("%Y%m%d").to_string(),
+            ..Default::default()
         };
 
         let cae = fe_cae_solicitar_factura_c(&cliente, url, &ta, 20_375_625_491, &params)

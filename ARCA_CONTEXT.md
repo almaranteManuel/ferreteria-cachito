@@ -99,7 +99,7 @@ comprobante y consume numeración).
 
 ## 8. PASO 9: PANTALLA DE FACTURACIÓN — CODIFICADO, FALTA PROBAR
 
-Implementado y compilando (backend 26 tests OK offline, frontend tsc+vite verde):
+Implementado y compilando (backend 30 tests OK offline, frontend tsc+vite verde):
 
 - **Backend**: migración `0004_facturas.sql` (tablas facturas/factura_items,
   desacopladas de sales), `models/factura.rs`, `factura_repo.rs` (numeración
@@ -112,13 +112,29 @@ Implementado y compilando (backend 26 tests OK offline, frontend tsc+vite verde)
   confirmación antes de emitir**, diálogo post-emisión con **vista previa**
   del comprobante y botón "Imprimir factura" (no imprime si no se toca).
 - **Impresión**: HTML/CSS + window.print(), A4, logo placeholder en
-  `src/assets/logo-ferreteria.png` (REEMPLAZAR por el logo real), CSS @media
+  `src/assets/puerto-logo.png`, CSS @media
   print aísla `.factura-print-area`. Datos emisor en
   `features/facturacion/types/index.ts` (DATOS_EMISOR, editables).
 - Decisión del dueño: NO descuenta stock (solo registro fiscal), papel A4.
 
+## 8b. CLIENTE POR CUIT (PADRÓN A5)
+
+- `arca/padron.rs`: getPersona contra personaServiceA5 (homo:
+  awshomo.afip.gov.ar/sr-padron/webservices/personaServiceA5, ns
+  http://a5.soap.ws.server.puc.sr/, servicio WSAA: ws_sr_padron_a5).
+  Mapeo condición IVA→CondicionIVAReceptorId: monotributo→6,
+  exento→4, inscripto→1, sin datos→5.
+- TA ahora multi-servicio (HashMap en ArcaState, archivos TA_{servicio}.xml).
+- Comando `buscar_persona_arca(cuit)`.
+- Factura con receptor identificado: builder FECAE acepta doc_tipo/doc_nro/
+  condicion_iva_receptor_id dinámicos; migración `0005_factura_receptor.sql`
+  agrega cliente_cuit + condicion_iva_receptor_id a facturas. El servicio exige
+  condición válida si se manda CUIT; sin CUIT queda CF (99/0/5).
+- UI: tarjeta Cliente con toggle Consumidor Final ↔ CUIT específico; búsqueda
+  autocompleta denominación/domicilio/condición; bloquea emitir hasta buscar;
+  avisa si ARCA informa estado != ACTIVO. La vista impresa muestra el cliente.
+
 **Pendiente de esta etapa:**
-- Reemplazar el logo placeholder por el real cuando lo tengan.
 - Primera emisión REAL desde la app en homologación (aún no se corrió;
   también está el test ignorado `fe_cae_solicitar_factura_c_real_homologacion`).
 - Verificar impresión física en la impresora A4.

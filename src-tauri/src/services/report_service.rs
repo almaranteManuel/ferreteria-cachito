@@ -1,4 +1,4 @@
-use crate::models::report::{build_yearly_report, YearlyReport};
+use crate::models::report::{build_yearly_report, with_totals_purchases_expenses, YearlyReport};
 use crate::repositories::report_repo::ReportRepository;
 use sqlx::SqlitePool;
 
@@ -9,7 +9,18 @@ impl ReportService {
         let rows = ReportRepository::monthly_sales_by_year(pool, year)
             .await
             .map_err(|e| format!("Error al generar reporte: {}", e))?;
-        Ok(build_yearly_report(year, rows))
+        let report = build_yearly_report(year, rows);
+        let total_purchases = ReportRepository::total_purchases_by_year(pool, year)
+            .await
+            .map_err(|e| format!("Error al calcular compras: {}", e))?;
+        let total_expenses = ReportRepository::total_expenses_by_year(pool, year)
+            .await
+            .map_err(|e| format!("Error al calcular gastos: {}", e))?;
+        Ok(with_totals_purchases_expenses(
+            report,
+            total_purchases,
+            total_expenses,
+        ))
     }
 
     pub async fn get_available_years(pool: &SqlitePool) -> Result<Vec<i32>, String> {

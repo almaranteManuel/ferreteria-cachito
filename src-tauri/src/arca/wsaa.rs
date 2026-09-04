@@ -41,25 +41,25 @@ pub async fn obtener_ta(
     let ta_xml = cliente.login_cms(url_wsaa, &cms).await?;
     let ta = Ta::parse_login_ticket_response(&ta_xml)?;
 
-    guardar_ta(paths, &ta_xml)?;
+    guardar_ta(paths, service, &ta_xml)?;
     Ok(ta)
 }
 
 /// Guarda el loginTicketResponse en disco (contiene token/sign:
 /// queda en app_data_dir con permisos del usuario, nunca en el repo).
-pub fn guardar_ta(paths: &ArcaPaths, ta_xml: &str) -> ArcaResult<()> {
-    fs::write(ta_path_de(paths), ta_xml)?;
+pub fn guardar_ta(paths: &ArcaPaths, service: &str, ta_xml: &str) -> ArcaResult<()> {
+    fs::write(ta_path_de(paths, service), ta_xml)?;
     Ok(())
 }
 
-fn ta_path_de(paths: &ArcaPaths) -> std::path::PathBuf {
-    // Un TA por servicio; hoy solo wsfe.
-    paths.dir_arca.join(format!("TA_wsfe.xml"))
+fn ta_path_de(paths: &ArcaPaths, service: &str) -> std::path::PathBuf {
+    // Un archivo de TA por servicio (TA_wsfe.xml, TA_ws_sr_padron_a5.xml...).
+    paths.dir_arca.join(format!("TA_{service}.xml"))
 }
 
 /// Carga un TA previamente persistido, si existe y es válido.
-pub fn cargar_ta(paths: &ArcaPaths) -> Option<Ta> {
-    let ruta = ta_path_de(paths);
+pub fn cargar_ta(paths: &ArcaPaths, service: &str) -> Option<Ta> {
+    let ruta = ta_path_de(paths, service);
     if !ruta.exists() {
         return None;
     }
@@ -211,7 +211,7 @@ mod tests {
         );
 
         // Persistencia roundtrip
-        let ta_disco = cargar_ta(&paths).expect("TA recién guardado debe cargarse");
+        let ta_disco = cargar_ta(&paths, "wsfe").expect("TA recién guardado debe cargarse");
         assert_eq!(ta_disco.expiration_time, ta.expiration_time);
 
         println!(

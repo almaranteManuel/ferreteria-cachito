@@ -28,7 +28,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { calcSalePrice } from '@/features/sales/types';
-import { ItemFacturaCarrito } from '../types';
+import { ItemFacturaCarrito, PersonaArca } from '../types';
+import { facturacionApi } from '../api/facturacionApi';
 import { useEmitirFactura } from '../hooks/useFacturacion';
 import { FacturaEmitidaDialog } from '../components/FacturaEmitidaDialog';
 
@@ -45,6 +46,13 @@ export const FacturacionPage: React.FC = () => {
   const [manualDescripcion, setManualDescripcion] = useState('');
   const [manualCantidad, setManualCantidad] = useState('1');
   const [manualPrecio, setManualPrecio] = useState('');
+
+  // Cliente
+  const [modoCliente, setModoCliente] = useState<'CF' | 'CUIT'>('CF');
+  const [cuitInput, setCuitInput] = useState('');
+  const [buscandoPersona, setBuscandoPersona] = useState(false);
+  const [persona, setPersona] = useState<PersonaArca | null>(null);
+  const [clienteError, setClienteError] = useState<string | null>(null);
 
   const { emitir, emitting, error, ultimaEmitida, limpiar } = useEmitirFactura();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -116,6 +124,40 @@ export const FacturacionPage: React.FC = () => {
 
   const total = cart.reduce((acc, i) => acc + i.cantidad * i.precio_unitario, 0);
 
+  const cambiarModoCliente = (modo: 'CF' | 'CUIT') => {
+    setModoCliente(modo);
+    setPersona(null);
+    setClienteError(null);
+    if (modo === 'CF') setCuitInput('');
+  };
+
+  const buscarPersona = async () => {
+    const cuit = cuitInput.replace(/\D/g, '');
+    setPersona(null);
+    setClienteError(null);
+
+    if (cuit.length !== 11) {
+      setClienteError('El CUIT tiene 11 dígitos.');
+      return;
+    }
+
+    setBuscandoPersona(true);
+    try {
+      const p = await facturacionApi.buscarPersonaArca(Number(cuit));
+      if (p.estado && p.estado !== 'ACTIVO') {
+        setClienteError(
+          `ARCA informa estado "${p.estado}" para ese CUIT. No conviene facturar.`
+        );
+        return;
+      }
+      setPersona(p);
+    } catch (e) {
+      setClienteError(String(e));
+    } finally {
+      setBuscandoPersona(false);
+    }
+  };
+
   const emitirFactura = async () => {
     const factura = await emitir({
       items: cart.map((i) => ({
@@ -124,7 +166,10 @@ export const FacturacionPage: React.FC = () => {
         precio_unitario: i.precio_unitario,
         product_id: i.product_id,
       })),
-      cliente_nombre: null,
+      cliente_nombre: persona?.denominacion ?? null,
+      cliente_cuit: modoCliente === 'CUIT' && persona ? Number(cuitInput.replace(/\D/g, '')) : null,
+      condicion_iva_receptor_id:
+        modoCliente === 'CUIT' && persona ? persona.condicion_iva_receptor_id : null,
     });
     setConfirmarAbierto(false);
     if (factura) {
@@ -138,9 +183,81 @@ export const FacturacionPage: React.FC = () => {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Facturación</h2>
         <p className="text-muted-foreground text-sm">
-          Factura C electrónica a Consumidor Final (ARCA homologación).
+          Factura C electrónica (ARCA homologación).
         </p>
       </div>
+
+      {/* CLIENTE */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle>Cliente</CardTitle>
+          <CardDescription>
+            Consumidor Final o un CUIT específico (datos autocompletados desde
+            ARCA).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant={modoCliente === 'CF' ? 'default' : 'outline'}
+              onClick={() => cambiarModoCliente('CF')}
+            >
+              Consumidor Final
+            </Button>
+            <Button
+              size="sm"
+              variant={modoCliente === 'CUIT' ? 'default' : 'outline'}
+              onClick={() => cambiarModoCliente('CUIT')}
+            >
+              CUIT específico
+            </Button>
+          </div>
+
+          {modoCliente === 'CUIT' && (
+            <div className="space-y-3">
+              <div className="flex gap-2 items-end max-w-md">
+                <div className="space-y-1 flex-1">
+                  <Label htmlFor="cuit-cliente">CUIT del cliente</Label>
+                  <Input
+                    id="cuit-cliente"
+                    inputMode="numeric"
+                    placeholder="20-12345678-9"
+                    value={cuitInput}
+                    onChange={(e) => setCuitInput(e.target.value.replace(/[^\d-]/g, ''))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') buscarPersona();
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="secondary"
+                  onClick={buscarPersona}
+                  disabled={buscandoPersona}
+                >
+                  {buscandoPersona ? 'Buscando...' : 'Buscar'}
+                </Button>
+              </div>
+
+              {clienteError && (
+                <p className="text-sm text-destructive">{clienteError}</p>
+              )}
+
+              {persona && (
+                <div className="border rounded-md p-3 text-sm space-y-1 bg-muted/30">
+                  <p className="font-semibold">{persona.denominacion}</p>
+                  <p className="text-muted-foreground">
+                    CUIT {persona.cuit} · {persona.condicion_iva_desc}
+                  </p>
+                  {persona.domicilio && (
+                    <p className="text-muted-foreground">{persona.domicilio}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* CARGA DE ÍTEMS */}
@@ -309,11 +426,21 @@ export const FacturacionPage: React.FC = () => {
             <Button
               className="w-full"
               size="lg"
-              disabled={emitting || cart.length === 0 || total <= 0}
+              disabled={
+                emitting ||
+                cart.length === 0 ||
+                total <= 0 ||
+                (modoCliente === 'CUIT' && !persona)
+              }
               onClick={() => setConfirmarAbierto(true)}
             >
               {emitting ? 'Emitiendo...' : 'Emitir Factura C'}
             </Button>
+            {modoCliente === 'CUIT' && !persona && (
+              <p className="text-xs text-muted-foreground text-center">
+                Buscá el CUIT del cliente antes de emitir.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -324,7 +451,14 @@ export const FacturacionPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>¿Emitir esta factura?</DialogTitle>
             <DialogDescription>
-              Se solicitará un CAE a ARCA por una Factura C de{' '}
+              {modoCliente === 'CUIT' && persona ? (
+                <>
+                  Factura C para <span className="font-semibold text-foreground">{persona.denominacion}</span>{' '}
+                  (CUIT {persona.cuit}) por{' '}
+                </>
+              ) : (
+                'Se solicitará un CAE a ARCA por una Factura C de '
+              )}
               <span className="font-semibold text-foreground">
                 ${nf.format(total)}
               </span>{' '}

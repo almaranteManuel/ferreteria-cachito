@@ -1,8 +1,8 @@
 export interface Supplier {
   id: number;
   name: string;
-  contact_email: string | null;
-  contact_phone: string | null;
+  email: string | null;
+  phone: string | null;
   address: string | null;
   created_at: string;
   updated_at: string;
@@ -10,14 +10,15 @@ export interface Supplier {
 
 export interface CreateSupplierDto {
   name: string;
-  contact_email?: string | null;
-  contact_phone?: string | null;
+  email?: string | null;
+  phone?: string | null;
   address?: string | null;
 }
 
 export interface UpdateSupplierDto {
-  name?: string;
-  contact_email?: string | null;
-  contact_phone?: string | null;
+  id: number;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
   address?: string | null;
 }
