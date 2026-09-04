@@ -34,9 +34,9 @@ export function useSales() {
   const deleteSale = async (id: number) => {
     await saleApi.deleteSale(id);
     if (dateRange) {
-      fetchSales(dateRange.start, dateRange.end);
+      await fetchSales(dateRange.start, dateRange.end);
     } else {
-      fetchSales();
+      await fetchSales();
     }
   };
 
@@ -47,11 +47,11 @@ export function useSales() {
     dateRange,
     setDateRange,
     deleteSale,
-    refreshSales: () => {
+    refreshSales: async () => {
       if (dateRange) {
-        fetchSales(dateRange.start, dateRange.end);
+        await fetchSales(dateRange.start, dateRange.end);
       } else {
-        fetchSales();
+        await fetchSales();
       }
     },
   };

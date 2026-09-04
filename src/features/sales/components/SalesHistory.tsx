@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSales } from '../hooks/useSales';
+import { Sale } from '../types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -8,8 +8,23 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 
-export const SalesHistory: React.FC = () => {
-  const { sales, loading, error, dateRange, setDateRange, deleteSale } = useSales();
+interface SalesHistoryProps {
+  sales: Sale[];
+  loading: boolean;
+  error: string | null;
+  dateRange: { start: string; end: string } | null;
+  setDateRange: (dateRange: { start: string; end: string } | null) => void;
+  deleteSale: (id: number) => Promise<void>;
+}
+
+export const SalesHistory: React.FC<SalesHistoryProps> = ({
+  sales,
+  loading,
+  error,
+  dateRange,
+  setDateRange,
+  deleteSale,
+}) => {
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);

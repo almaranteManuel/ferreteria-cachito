@@ -4,6 +4,7 @@ import { productApi } from '../api/productApi';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +23,14 @@ export function useProducts() {
     }
   }, []);
 
+  const fetchTotalProducts = useCallback(async () => {
+    try {
+      setTotalProducts(await productApi.countProducts());
+    } catch (err) {
+      setError(String(err));
+    }
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProducts(searchQuery);
@@ -30,12 +39,19 @@ export function useProducts() {
     return () => clearTimeout(timer);
   }, [searchQuery, fetchProducts]);
 
+  useEffect(() => {
+    fetchTotalProducts();
+  }, [fetchTotalProducts]);
+
   return {
     products,
     searchQuery,
     setSearchQuery,
     loading,
     error,
-    refreshProducts: () => fetchProducts(searchQuery),
+    totalProducts,
+    refreshProducts: async () => {
+      await Promise.all([fetchProducts(searchQuery), fetchTotalProducts()]);
+    },
   };
 }

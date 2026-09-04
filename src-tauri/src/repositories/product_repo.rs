@@ -43,13 +43,18 @@ impl ProductRepository {
             FROM products
             WHERE code LIKE ? OR description LIKE ?
             ORDER BY description ASC
-            LIMIT 50
             "#,
         )
         .bind(&pattern)
         .bind(&pattern)
         .fetch_all(pool)
         .await
+    }
+
+    pub async fn count(pool: &SqlitePool) -> Result<i64> {
+        sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM products")
+            .fetch_one(pool)
+            .await
     }
 
     /// Inserta un nuevo producto

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useProducts } from '../hooks/useProducts';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Product } from '../types';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,12 +8,42 @@ import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
 
 interface ProductTableProps {
+  products: Product[];
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  loading: boolean;
+  error: string | null;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ onEdit, onDelete }) => {
-    const { products, searchQuery, setSearchQuery, loading, error } = useProducts();
+export const ProductTable: React.FC<ProductTableProps> = ({
+    products,
+    searchQuery,
+    setSearchQuery,
+    loading,
+    error,
+    onEdit,
+    onDelete,
+}) => {
+    const pageSize = 20;
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
+    const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
+    const visibleProducts = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return products.slice(start, start + pageSize);
+    }, [currentPage, products]);
+
+    useEffect(() => {
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-AR', {
@@ -64,7 +93,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ onEdit, onDelete }) 
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {products.map((product) => (
+                                {visibleProducts.map((product) => (
                                     <TableRow key={product.id}>
                                         <TableCell className="max-w-[300px] truncate">
                                             {product.description}
@@ -101,6 +130,35 @@ export const ProductTable: React.FC<ProductTableProps> = ({ onEdit, onDelete }) 
                                 ))}
                             </TableBody>
                         </Table>
+                    )}
+                    {!loading && !error && products.length > 0 && (
+                        <div className="flex items-center justify-between gap-4 pt-4 text-sm text-slate-500">
+                            <span>
+                                Mostrando {(currentPage - 1) * pageSize + 1}-
+                                {Math.min(currentPage * pageSize, products.length)} de {products.length}
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage((page) => page - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Anterior
+                                </Button>
+                                <span>
+                                    Página {currentPage} de {totalPages}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage((page) => page + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Siguiente
+                                </Button>
+                            </div>
+                        </div>
                     )}
                 </CardContent>
             </Card>

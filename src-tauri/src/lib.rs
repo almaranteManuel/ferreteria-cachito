@@ -42,6 +42,7 @@ pub fn run() {
             // Product commands
             commands::product_cmd::get_product_by_id,
             commands::product_cmd::search_products,
+            commands::product_cmd::count_products,
             commands::product_cmd::create_product,
             commands::product_cmd::update_product,
             commands::product_cmd::delete_product,

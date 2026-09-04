@@ -15,7 +15,7 @@ import { CartItem, calcSalePrice, PAYMENT_METHODS } from '../types';
 import { saleApi } from '../api/saleApi';
 
 interface ManualSaleFormProps {
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
 }
 
 export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => {
@@ -124,7 +124,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
         })),
       });
       setCart([]);
-      onSuccess();
+      await onSuccess();
     } catch (err) {
       setError(String(err));
     } finally {

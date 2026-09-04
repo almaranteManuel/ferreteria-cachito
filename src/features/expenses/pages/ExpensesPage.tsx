@@ -132,8 +132,8 @@ export const ExpensesPage: React.FC = () => {
         <>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Registrar compra a proveedor</CardTitle>
-              <CardDescription>Se guarda en `purchases` (misma tabla que usan los 605 registros históricos)</CardDescription>
+              <CardTitle className="text-base">Registrar compra</CardTitle>
+              <CardDescription>Agrega una nueva compra a un proveedor</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {pError && <div className="p-3 text-sm bg-red-50 text-red-700 border border-red-200 rounded-md">{pError}</div>}

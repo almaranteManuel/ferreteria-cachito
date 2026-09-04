@@ -8,7 +8,15 @@ import { ProductTable } from '../components/productTable';
 import { ProductFormDialog } from '../components/productFormDialog';
 
 export const ProductsPage: React.FC = () => {
-  const { error, refreshProducts } = useProducts();
+  const {
+    products,
+    searchQuery,
+    setSearchQuery,
+    loading,
+    error,
+    totalProducts,
+    refreshProducts,
+  } = useProducts();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -26,7 +34,7 @@ export const ProductsPage: React.FC = () => {
   const handleDeleteProduct = async (product: Product) => {
     if (!confirm(`¿Eliminar "${product.description}"?`)) return;
     await productApi.deleteProduct(product.id);
-    refreshProducts();
+    await refreshProducts();
   };
 
   const handleSubmitProduct = async (dto: CreateProductDto | UpdateProductDto) => {
@@ -39,7 +47,7 @@ export const ProductsPage: React.FC = () => {
     } else {
       await productApi.createProduct(dto as CreateProductDto);
     }
-    refreshProducts();
+    await refreshProducts();
   };
 
   return (
@@ -64,7 +72,20 @@ export const ProductsPage: React.FC = () => {
         </div>
       )}
 
-      <ProductTable onEdit={handleEditProduct} onDelete={handleDeleteProduct} />
+      <div className="rounded-lg border bg-white p-4 shadow-sm">
+        <p className="text-sm text-slate-500">Total de productos</p>
+        <p className="text-2xl font-semibold text-slate-900">{totalProducts}</p>
+      </div>
+
+      <ProductTable
+        products={products}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        loading={loading}
+        error={error}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
+      />
 
       <ProductFormDialog
         open={isModalOpen}

@@ -24,6 +24,12 @@ impl ProductService {
             .map_err(|e| format!("Error al buscar productos: {}", e))
     }
 
+    pub async fn count_products(pool: &SqlitePool) -> Result<i64, String> {
+        ProductRepository::count(pool)
+            .await
+            .map_err(|e| format!("Error al contar productos: {}", e))
+    }
+
     pub async fn create_product(pool: &SqlitePool, dto: CreateProductDto) -> Result<Product, String> {
         // Validaciones de negocio
         if dto.code.trim().is_empty() {

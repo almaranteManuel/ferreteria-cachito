@@ -9,10 +9,18 @@ type SaleMode = 'daily' | 'manual';
 
 export const SalesPage: React.FC = () => {
   const [mode, setMode] = useState<SaleMode>('daily');
-  const { refreshSales } = useSales();
+  const {
+    sales,
+    loading,
+    error,
+    dateRange,
+    setDateRange,
+    deleteSale,
+    refreshSales,
+  } = useSales();
 
-  const handleSuccess = () => {
-    refreshSales();
+  const handleSuccess = async () => {
+    await refreshSales();
   };
 
   return (
@@ -45,7 +53,14 @@ export const SalesPage: React.FC = () => {
         <ManualSaleForm onSuccess={handleSuccess} />
       )}
 
-      <SalesHistory />
+      <SalesHistory
+        sales={sales}
+        loading={loading}
+        error={error}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        deleteSale={deleteSale}
+      />
     </div>
   );
 };

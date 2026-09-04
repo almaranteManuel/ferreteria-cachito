@@ -55,7 +55,6 @@ export const PresupuestoPrintView: React.FC<Props> = ({ presupuesto }) => {
       <table className="w-full mt-4 border-collapse">
         <thead>
           <tr className="border-b-2 border-black text-left text-xs uppercase bg-slate-50">
-            <th className="py-2 pr-2 w-24">Código</th>
             <th className="py-2 pr-2">Descripción</th>
             <th className="py-2 px-2 text-right w-20">Cant.</th>
             <th className="py-2 px-2 text-right w-28">Precio unit.</th>
@@ -65,9 +64,6 @@ export const PresupuestoPrintView: React.FC<Props> = ({ presupuesto }) => {
         <tbody>
           {presupuesto.items.map((item) => (
             <tr key={item.id} className="border-b border-gray-300">
-              <td className="py-1.5 pr-2 font-mono text-xs text-gray-600">
-                {item.code || '—'}
-              </td>
               <td className="py-1.5 pr-2">{item.descripcion}</td>
               <td className="py-1.5 px-2 text-right">{item.cantidad}</td>
               <td className="py-1.5 px-2 text-right">${item.precio_unitario.toFixed(2)}</td>
@@ -91,12 +87,12 @@ export const PresupuestoPrintView: React.FC<Props> = ({ presupuesto }) => {
 
       {/* Footer comercial barrial */}
       <div className="mt-10 border-t border-gray-400 pt-3 text-xs space-y-1">
-        <p className="font-semibold text-[#0A2A5A]">Puerto Ferretería — Manuel Leiva 510</p>
+        <p className="font-semibold text-[#0A2A5A]">Puerto Ferretería — Manuel Leiva 548</p>
         <p className="text-[11px] text-gray-600">
           Presupuesto sin validez temporal. Precios sujetos a modificación sin previo aviso. No válido como factura.
         </p>
         <p className="text-[10px] text-gray-500 mt-2">
-          Documento generado por Gestión Cachito · Gracias por su consulta
+          Documento generado por Gestión Puerto · Gracias por su consulta
         </p>
       </div>
     </div>

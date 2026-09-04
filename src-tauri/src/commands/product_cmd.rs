@@ -22,6 +22,11 @@ pub async fn search_products(
 }
 
 #[tauri::command]
+pub async fn count_products(pool: State<'_, SqlitePool>) -> Result<i64, String> {
+    ProductService::count_products(pool.inner()).await
+}
+
+#[tauri::command]
 pub async fn create_product(
     pool: State<'_, SqlitePool>,
     dto: CreateProductDto,

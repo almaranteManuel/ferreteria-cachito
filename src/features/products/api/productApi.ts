@@ -6,6 +6,10 @@ export const productApi = {
     return await invoke<Product[]>('search_products', { query });
   },
 
+  countProducts: async (): Promise<number> => {
+    return await invoke<number>('count_products');
+  },
+
   getProductById: async (id: number): Promise<Product> => {
     return await invoke<Product>('get_product_by_id', { id });
   },

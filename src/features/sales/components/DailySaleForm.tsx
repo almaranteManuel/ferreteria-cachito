@@ -7,7 +7,7 @@ import { PAYMENT_METHODS } from '../types';
 import { saleApi } from '../api/saleApi';
 
 interface DailySaleFormProps {
-  onSuccess: () => void;
+  onSuccess: () => Promise<void>;
 }
 
 export const DailySaleForm: React.FC<DailySaleFormProps> = ({ onSuccess }) => {
@@ -35,7 +35,7 @@ export const DailySaleForm: React.FC<DailySaleFormProps> = ({ onSuccess }) => {
         payment_method: paymentMethod,
       });
       setAmount('');
-      onSuccess();
+      await onSuccess();
     } catch (err) {
       setError(String(err));
     } finally {
