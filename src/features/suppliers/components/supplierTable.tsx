@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSuppliers } from '../hooks/useSuppliers';
 import { Supplier } from '../types';
 
@@ -15,6 +15,24 @@ interface SupplierTableProps {
 
 export const SupplierTable: React.FC<SupplierTableProps> = ({ onEdit, onDelete }) => {
   const { suppliers, searchQuery, setSearchQuery, loading, error } = useSuppliers();
+  const pageSize = 20;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.max(1, Math.ceil(suppliers.length / pageSize));
+  const visibleSuppliers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return suppliers.slice(start, start + pageSize);
+  }, [currentPage, suppliers]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
     return (
     <>
@@ -46,7 +64,8 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({ onEdit, onDelete }
             ) : suppliers.length === 0 ? (
             <p>No se encontraron proveedores.</p>
           ) : (
-            <Table>
+              <>
+              <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Nombre</TableHead>
@@ -57,7 +76,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({ onEdit, onDelete }
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {suppliers.map((supplier) => (
+                    {visibleSuppliers.map((supplier) => (
                         <TableRow key={supplier.id}>
                             <TableCell>{supplier.name}</TableCell>
                             <TableCell>{supplier.email || '—'}</TableCell>
@@ -87,6 +106,34 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({ onEdit, onDelete }
                     ))}
                 </TableBody>
             </Table>
+            <div className="flex items-center justify-between gap-4 pt-4 text-sm text-slate-500">
+              <span>
+                Mostrando {(currentPage - 1) * pageSize + 1}-
+                {Math.min(currentPage * pageSize, suppliers.length)} de {suppliers.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((page) => page - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Anterior
+                </Button>
+                <span>
+                  Página {currentPage} de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((page) => page + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </div>
+            </>
           )}
         </CardContent>
       </Card>

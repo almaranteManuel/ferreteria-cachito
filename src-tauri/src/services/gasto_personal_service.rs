@@ -38,6 +38,16 @@ impl GastoPersonalService {
             .map_err(|e| format!("Error al listar gastos: {}", e))
     }
 
+    pub async fn listar_por_rango(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<GastoPersonal>, String> {
+        GastoPersonalRepository::list_by_date_range(pool, start, end)
+            .await
+            .map_err(|e| format!("Error al listar gastos por rango de fechas: {}", e))
+    }
+
     pub async fn eliminar(pool: &SqlitePool, id: i64) -> Result<(), String> {
         let ok = GastoPersonalRepository::delete(pool, id)
             .await

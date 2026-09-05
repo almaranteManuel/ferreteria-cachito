@@ -14,6 +14,21 @@ impl GastoPersonalRepository {
         .await
     }
 
+    pub async fn list_by_date_range(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<GastoPersonal>> {
+        sqlx::query_as::<_, GastoPersonal>(
+            "SELECT id, fecha, CAST(monto AS REAL) AS monto, descripcion, categoria, created_at
+             FROM gastos_personales WHERE fecha >= ? AND fecha <= ? ORDER BY fecha DESC, id DESC",
+        )
+        .bind(start)
+        .bind(end)
+        .fetch_all(pool)
+        .await
+    }
+
     pub async fn total_by_year(pool: &SqlitePool, year: i32) -> Result<f64> {
         let pattern = format!("{}%", year);
         let total: Option<f64> = sqlx::query_scalar(

@@ -30,8 +30,9 @@ import {
 import { calcSalePrice } from '@/features/sales/types';
 import { ItemFacturaCarrito, PersonaArca } from '../types';
 import { facturacionApi } from '../api/facturacionApi';
-import { useEmitirFactura } from '../hooks/useFacturacion';
+import { useEmitirFactura, useFacturas } from '../hooks/useFacturacion';
 import { FacturaEmitidaDialog } from '../components/FacturaEmitidaDialog';
+import { FacturasHistory } from '../components/FacturasHistory';
 
 const nf = new Intl.NumberFormat('es-AR', {
   minimumFractionDigits: 2,
@@ -55,6 +56,8 @@ export const FacturacionPage: React.FC = () => {
   const [clienteError, setClienteError] = useState<string | null>(null);
 
   const { emitir, emitting, error, ultimaEmitida, limpiar } = useEmitirFactura();
+  const { facturas, loading: facturasLoading, error: facturasError, refresh: refreshFacturas } =
+    useFacturas();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmarAbierto, setConfirmarAbierto] = useState(false);
 
@@ -174,6 +177,7 @@ export const FacturacionPage: React.FC = () => {
     setConfirmarAbierto(false);
     if (factura) {
       setCart([]);
+      await refreshFacturas();
       setDialogOpen(true);
     }
   };
@@ -444,6 +448,12 @@ export const FacturacionPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <FacturasHistory
+        facturas={facturas}
+        loading={facturasLoading}
+        error={facturasError}
+      />
 
       {/* CONFIRMACIÓN PREVIA A LA EMISIÓN */}
       <Dialog open={confirmarAbierto} onOpenChange={setConfirmarAbierto}>

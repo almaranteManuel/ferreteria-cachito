@@ -6,12 +6,14 @@ import { supplierApi } from '../api/supplierApi';
 import { Button } from '@/components/ui/button';
 import { SupplierTable } from '@/features/suppliers/components/supplierTable';
 import { SupplierFormDialog } from '@/features/suppliers/components/SupplierFormDialog';
+import { useConfirmDialog } from '@/components/ConfirmDialog';
 
 export const SuppliersPage: React.FC = () => {
   const { error, refreshSuppliers } = useSuppliers();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const { requestConfirmation, confirmationDialog } = useConfirmDialog();
 
   const handleOpenCreateModal = () => {
     setSelectedSupplier(null);
@@ -24,7 +26,12 @@ export const SuppliersPage: React.FC = () => {
   };
 
   const handleDeleteSupplier = async (supplier: Supplier) => {
-    if (!confirm(`¿Eliminar "${supplier.name}"?`)) return;
+    if (
+      !(await requestConfirmation({
+        title: 'Eliminar proveedor',
+        description: `¿Querés eliminar "${supplier.name}"? Esta acción no se puede deshacer.`,
+      }))
+    ) return;
     await supplierApi.deleteSupplier(supplier.id);
     refreshSuppliers();
   };
@@ -68,6 +75,7 @@ export const SuppliersPage: React.FC = () => {
         supplierToEdit={selectedSupplier}
         onSubmit={handleSubmitSupplier}
       />
+      {confirmationDialog}
     </div>
   );
 };

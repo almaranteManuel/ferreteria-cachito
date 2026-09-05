@@ -53,4 +53,14 @@ impl PurchaseService {
             .await
             .map_err(|e| format!("Error al listar compras: {}", e))
     }
+
+    pub async fn list_purchases_by_date_range(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<Purchase>, String> {
+        PurchaseRepository::list_by_date_range(pool, start, end)
+            .await
+            .map_err(|e| format!("Error al listar compras por rango de fechas: {}", e))
+    }
 }

@@ -88,7 +88,9 @@ pub async fn wsfe_ping(app: AppHandle) -> Result<WsfePing, String> {
     })
 }
 
-/// Consulta Padrón A5: datos de un contribuyente por CUIT.
+/// Consulta Padrón (dual A5 / Constancia): datos de un contribuyente por CUIT.
+/// Prueba primero el servicio vigente del ambiente y hace fallback al otro
+/// para no romper instalaciones desktop si ARCA depreca A5.
 #[tauri::command]
 pub async fn buscar_persona_arca(
     app: AppHandle,
@@ -101,12 +103,30 @@ pub async fn buscar_persona_arca(
     let url_wsaa = cfg.ambiente.wsaa_url().map_err(|e| e.to_string())?;
     let url_padron = cfg.ambiente.padron_url().map_err(|e| e.to_string())?;
 
-    let ta = arca
-        .ta_valido(&paths, url_wsaa, padron::SERVICIO_PADRON_A5)
-        .await
-        .map_err(|e| e.to_string())?;
+    let mut ultimo_error: Option<String> = None;
+    for servicio in cfg.ambiente.padron_services_dual() {
+        let ta = match arca.ta_valido(&paths, url_wsaa, servicio).await {
+            Ok(ta) => ta,
+            Err(e) => {
+                ultimo_error = Some(e.to_string());
+                continue;
+            }
+        };
 
-    padron::buscar_persona(&arca.cliente, url_padron, &ta, cfg.cuit, cuit)
-        .await
-        .map_err(|e| e.to_string())
+        match padron::buscar_persona(&arca.cliente, url_padron, &ta, cfg.cuit, cuit).await {
+            Ok(persona) => return Ok(persona),
+            Err(e) => {
+                let msg = e.to_string();
+                // Si ARCA responde "no autorizado para este servicio", probar fallback.
+                let es_fallback = msg.contains("no autoriz") || msg.contains("not authorized") || msg.contains("601") || msg.contains("10000");
+                ultimo_error = Some(msg);
+                if !es_fallback {
+                    // Error de negocio (CUIT inexistente, etc.): no reintentar con otro servicio.
+                    break;
+                }
+            }
+        }
+    }
+
+    Err(ultimo_error.unwrap_or_else(|| "No se pudo consultar el padrón con ninguno de los servicios".into()))
 }

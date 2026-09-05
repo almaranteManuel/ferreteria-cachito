@@ -42,3 +42,12 @@ pub async fn list_recent_purchases(
 ) -> Result<Vec<Purchase>, String> {
     PurchaseService::list_recent_purchases(pool.inner(), limit.unwrap_or(50)).await
 }
+
+#[tauri::command]
+pub async fn list_purchases_by_date_range(
+    pool: State<'_, SqlitePool>,
+    start: String,
+    end: String,
+) -> Result<Vec<Purchase>, String> {
+    PurchaseService::list_purchases_by_date_range(pool.inner(), &start, &end).await
+}

@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PAYMENT_METHODS } from '../types';
 import { saleApi } from '../api/saleApi';
+import { DatePicker } from '@/components/ui/date-picker';
 
 interface DailySaleFormProps {
   onSuccess: () => Promise<void>;
@@ -57,11 +58,10 @@ export const DailySaleForm: React.FC<DailySaleFormProps> = ({ onSuccess }) => {
           )}
           <div className="space-y-2">
             <Label htmlFor="daily-date">Fecha</Label>
-            <Input
+            <DatePicker
               id="daily-date"
-              type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={setDate}
             />
           </div>
           <div className="space-y-2">

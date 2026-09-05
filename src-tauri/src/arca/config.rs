@@ -24,18 +24,14 @@ impl Ambiente {
     pub fn wsaa_url(&self) -> ArcaResult<&'static str> {
         match self {
             Ambiente::Homologacion => Ok("https://wsaahomo.afip.gov.ar/ws/services/LoginCms"),
-            Ambiente::Produccion => Err(ArcaError::Config(
-                "Producción no habilitada todavía: falta migración explícita".into(),
-            )),
+            Ambiente::Produccion => Ok("https://wsaa.afip.gov.ar/ws/services/LoginCms"),
         }
     }
 
     pub fn wsfe_url(&self) -> ArcaResult<&'static str> {
         match self {
             Ambiente::Homologacion => Ok("https://wswhomo.afip.gov.ar/wsfev1/service.asmx"),
-            Ambiente::Produccion => Err(ArcaError::Config(
-                "Producción no habilitada todavía: falta migración explícita".into(),
-            )),
+            Ambiente::Produccion => Ok("https://servicios1.afip.gov.ar/wsfev1/service.asmx"),
         }
     }
 
@@ -44,9 +40,31 @@ impl Ambiente {
             Ambiente::Homologacion => {
                 Ok("https://awshomo.afip.gov.ar/sr-padron/webservices/personaServiceA5")
             }
-            Ambiente::Produccion => Err(ArcaError::Config(
-                "Producción no habilitada todavía: falta migración explícita".into(),
-            )),
+            Ambiente::Produccion => Ok("https://aws.afip.gov.ar/sr-padron/webservices/personaServiceA5"),
+        }
+    }
+
+    /// Servicio WSAA para el padrón: A5 en homo (compat), Constancia en prod (vigente).
+    /// El XML (`getPersona`) y endpoint son iguales; cambia solo el `service` del TA.
+    pub fn padron_service(&self) -> &'static str {
+        match self {
+            Ambiente::Homologacion => crate::arca::padron::SERVICIO_PADRON_A5,
+            Ambiente::Produccion => crate::arca::padron::SERVICIO_PADRON_CONSTANCIA,
+        }
+    }
+
+    /// Orden de intento dual para instalaciones desktop: primario del ambiente + fallback al otro.
+    /// Evita que la deprecación de A5 rompa la app ya instalada.
+    pub fn padron_services_dual(&self) -> [&'static str; 2] {
+        match self {
+            Ambiente::Homologacion => [
+                crate::arca::padron::SERVICIO_PADRON_A5,
+                crate::arca::padron::SERVICIO_PADRON_CONSTANCIA,
+            ],
+            Ambiente::Produccion => [
+                crate::arca::padron::SERVICIO_PADRON_CONSTANCIA,
+                crate::arca::padron::SERVICIO_PADRON_A5,
+            ],
         }
     }
 }

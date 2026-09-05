@@ -6,6 +6,7 @@ import { productApi } from '../api/productApi';
 import { Button } from '@/components/ui/button';
 import { ProductTable } from '../components/productTable';
 import { ProductFormDialog } from '../components/productFormDialog';
+import { useConfirmDialog } from '@/components/ConfirmDialog';
 
 export const ProductsPage: React.FC = () => {
   const {
@@ -20,6 +21,7 @@ export const ProductsPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { requestConfirmation, confirmationDialog } = useConfirmDialog();
 
   const handleOpenCreateModal = () => {
     setSelectedProduct(null);
@@ -32,7 +34,12 @@ export const ProductsPage: React.FC = () => {
   };
 
   const handleDeleteProduct = async (product: Product) => {
-    if (!confirm(`¿Eliminar "${product.description}"?`)) return;
+    if (
+      !(await requestConfirmation({
+        title: 'Eliminar producto',
+        description: `¿Querés eliminar "${product.description}"? Esta acción no se puede deshacer.`,
+      }))
+    ) return;
     await productApi.deleteProduct(product.id);
     await refreshProducts();
   };
@@ -93,6 +100,7 @@ export const ProductsPage: React.FC = () => {
         productToEdit={selectedProduct}
         onSubmit={handleSubmitProduct}
       />
+      {confirmationDialog}
     </div>
   );
 };

@@ -63,6 +63,7 @@ pub fn run() {
             commands::purchase_cmd::update_purchase,
             commands::purchase_cmd::delete_purchase,
             commands::purchase_cmd::list_recent_purchases,
+            commands::purchase_cmd::list_purchases_by_date_range,
             // Sale commands
             commands::sale_cmd::get_sale_by_id,
             commands::sale_cmd::list_recent_sales,
@@ -97,6 +98,7 @@ pub fn run() {
             // Gastos personales commands
             commands::gasto_personal_cmd::crear_gasto_personal,
             commands::gasto_personal_cmd::listar_gastos_personales,
+            commands::gasto_personal_cmd::listar_gastos_personales_por_rango,
             commands::gasto_personal_cmd::eliminar_gasto_personal,
         ])
         .run(tauri::generate_context!())

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { CartItem, calcSalePrice, PAYMENT_METHODS } from '../types';
 import { saleApi } from '../api/saleApi';
+import { DatePicker } from '@/components/ui/date-picker';
 
 interface ManualSaleFormProps {
   onSuccess: () => Promise<void>;
@@ -24,6 +25,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [quantityInputs, setQuantityInputs] = useState<Record<number, string>>({});
   const [paymentMethod, setPaymentMethod] = useState('EFECTIVO');
   const [customerId, setCustomerId] = useState<string>('');
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -54,6 +56,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
 
   const addToCart = (product: Product) => {
     const unitPrice = calcSalePrice(product.price, product.variant);
+    const existingItem = cart.find((item) => item.product_id === product.id);
     setCart((prev) => {
       const existing = prev.find((i) => i.product_id === product.id);
       if (existing) {
@@ -75,15 +78,15 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
         },
       ];
     });
+    setQuantityInputs((prev) => ({
+      ...prev,
+      [product.id]: String((existingItem?.quantity ?? 0) + 1),
+    }));
     setSearchQuery('');
     setSearchResults([]);
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      setCart((prev) => prev.filter((i) => i.product_id !== productId));
-      return;
-    }
     setCart((prev) =>
       prev.map((i) => (i.product_id === productId ? { ...i, quantity } : i))
     );
@@ -106,6 +109,10 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
       setError('Agregá al menos un producto');
       return;
     }
+    if (cart.some((item) => item.quantity <= 0)) {
+      setError('Completá una cantidad válida para cada producto');
+      return;
+    }
     if (paymentMethod === 'CUENTA_CORRIENTE' && !customerId) {
       setError('Seleccioná un cliente para fiado');
       return;
@@ -124,6 +131,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
         })),
       });
       setCart([]);
+      setQuantityInputs({});
       await onSuccess();
     } catch (err) {
       setError(String(err));
@@ -179,7 +187,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
           {cart.length === 0 ? (
             <p className="text-sm text-slate-500">No hay productos en el carrito</p>
           ) : (
-            <Table>
+            <Table className="table-fixed">
               <TableHeader>
                 <TableRow>
                   <TableHead>Producto</TableHead>
@@ -191,23 +199,30 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
               <TableBody>
                 {cart.map((item) => (
                   <TableRow key={item.product_id}>
-                    <TableCell className="text-sm">{item.description}</TableCell>
+                    <TableCell className="max-w-0 whitespace-normal break-words text-sm">
+                      {item.description}
+                    </TableCell>
                     <TableCell>
                       <Input
                         type="number"
                         min={1}
-                        className="h-8"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(item.product_id, parseInt(e.target.value, 10) || 0)
-                        }
+                        className="h-8 w-full px-1"
+                        value={quantityInputs[item.product_id] ?? String(item.quantity)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setQuantityInputs((prev) => ({
+                            ...prev,
+                            [item.product_id]: value,
+                          }));
+                          updateQuantity(item.product_id, parseInt(value, 10) || 0);
+                        }}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         type="number"
                         step="0.01"
-                        className="h-8"
+                        className="h-8 w-full px-1"
                         value={item.unit_price}
                         onChange={(e) =>
                           updatePrice(item.product_id, parseFloat(e.target.value) || 0)
@@ -226,7 +241,7 @@ export const ManualSaleForm: React.FC<ManualSaleFormProps> = ({ onSuccess }) => 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Fecha</Label>
-              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <DatePicker value={date} onChange={setDate} />
             </div>
             <div className="space-y-2">
               <Label>Pago</Label>

@@ -33,6 +33,21 @@ impl PurchaseRepository {
         .await
     }
 
+    pub async fn list_by_date_range(
+        pool: &SqlitePool,
+        start: &str,
+        end: &str,
+    ) -> Result<Vec<Purchase>> {
+        sqlx::query_as::<_, Purchase>(
+            "SELECT id, date, CAST(totalAmount AS REAL) AS total_amount, supplier_id, created_at, updated_at
+             FROM purchases WHERE date >= ? AND date <= ? ORDER BY date DESC, id DESC",
+        )
+        .bind(start)
+        .bind(end)
+        .fetch_all(pool)
+        .await
+    }
+
     pub async fn total_by_year(pool: &SqlitePool, year: i32) -> Result<f64> {
         let pattern = format!("{}%", year);
         let total: Option<f64> = sqlx::query_scalar(

@@ -5,6 +5,8 @@ use crate::arca::soap::SoapClient;
 /// Servicio de consulta Padrón Alcance 5 (datos del contribuyente).
 pub const NS_PADRON_A5: &str = "http://a5.soap.ws.server.puc.sr/";
 pub const SERVICIO_PADRON_A5: &str = "ws_sr_padron_a5";
+/// Reemplazo vigente de A5: Constancia de Inscripción (mismo getPersona, distinto WSAA service).
+pub const SERVICIO_PADRON_CONSTANCIA: &str = "ws_sr_constancia_inscripcion";
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

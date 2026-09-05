@@ -20,6 +20,15 @@ pub async fn listar_gastos_personales(
 }
 
 #[tauri::command]
+pub async fn listar_gastos_personales_por_rango(
+    pool: State<'_, SqlitePool>,
+    start: String,
+    end: String,
+) -> Result<Vec<GastoPersonal>, String> {
+    GastoPersonalService::listar_por_rango(pool.inner(), &start, &end).await
+}
+
+#[tauri::command]
 pub async fn eliminar_gasto_personal(pool: State<'_, SqlitePool>, id: i64) -> Result<(), String> {
     GastoPersonalService::eliminar(pool.inner(), id).await
 }

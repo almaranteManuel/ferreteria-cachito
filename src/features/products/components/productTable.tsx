@@ -86,15 +86,20 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Código</TableHead>
                                     <TableHead>Descripción</TableHead>
-                                    <TableHead className="text-right">Precio</TableHead>
+                                    <TableHead className="text-right">Precio Mayorista</TableHead>
                                     <TableHead className="text-right">Precio de Venta</TableHead>
+                                    <TableHead className="text-right">Precio Propio</TableHead>
                                     <TableHead className="text-right w-[100px]">Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {visibleProducts.map((product) => (
                                     <TableRow key={product.id}>
+                                        <TableCell className="max-w-[150px] truncate">
+                                            {product.code}
+                                        </TableCell>
                                         <TableCell className="max-w-[300px] truncate">
                                             {product.description}
                                         </TableCell>
@@ -105,6 +110,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                             {product.price !== null && product.variant !== null
                                                 ? formatCurrency(product.price * product.variant)
                                                 : 'N/A'}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {product.own_price !== null ? formatCurrency(Number(product.own_price)) : 'N/A'}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-1">

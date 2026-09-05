@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Product } from '@/features/products/types';
 import { ProductSearchBar } from '@/features/products/components/productSearchBar';
 import { Button } from '@/components/ui/button';
+import { useConfirmDialog } from '@/components/ConfirmDialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -34,6 +35,7 @@ import { presupuestoApi } from '../api/presupuestoApi';
 import { PresupuestoPreviewDialog } from '../components/PresupuestoPreviewDialog';
 import { PresupuestoWithItems, formatearNumeroPresupuesto } from '../types';
 import { Trash2 } from 'lucide-react';
+import { DatePicker } from '@/components/ui/date-picker';
 
 const nf = new Intl.NumberFormat('es-AR', {
   minimumFractionDigits: 2,
@@ -41,6 +43,7 @@ const nf = new Intl.NumberFormat('es-AR', {
 });
 
 export const PresupuestosPage: React.FC = () => {
+  const { requestConfirmation, confirmationDialog } = useConfirmDialog();
   const today = new Date().toISOString().slice(0, 10);
   const [fecha, setFecha] = useState(today);
   const [clienteNombre, setClienteNombre] = useState('');
@@ -148,7 +151,12 @@ export const PresupuestosPage: React.FC = () => {
   };
 
   const eliminarPresupuesto = async (id: number) => {
-    if (!confirm('¿Eliminar presupuesto?')) return;
+    if (
+      !(await requestConfirmation({
+        title: 'Eliminar presupuesto',
+        description: '¿Querés eliminar este presupuesto? Esta acción no se puede deshacer.',
+      }))
+    ) return;
     try {
       await presupuestoApi.eliminar(id);
       refresh();
@@ -157,9 +165,15 @@ export const PresupuestosPage: React.FC = () => {
     }
   };
 
-  const limpiarCarrito = () => {
+  const limpiarCarrito = async () => {
     if (cart.length === 0) return;
-    if (!confirm('¿Limpiar carrito?')) return;
+    if (
+      !(await requestConfirmation({
+        title: 'Limpiar carrito',
+        description: 'Se quitarán todos los ítems cargados en el presupuesto actual.',
+        confirmLabel: 'Limpiar',
+      }))
+    ) return;
     setCart([]);
   };
 
@@ -254,11 +268,10 @@ export const PresupuestosPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="space-y-1">
                 <Label htmlFor="presupuesto-fecha">Fecha</Label>
-                <Input
+                <DatePicker
                   id="presupuesto-fecha"
-                  type="date"
                   value={fecha}
-                  onChange={(e) => setFecha(e.target.value)}
+                  onChange={setFecha}
                 />
               </div>
               <div className="space-y-1">
@@ -483,6 +496,7 @@ export const PresupuestosPage: React.FC = () => {
           }
         }}
       />
+      {confirmationDialog}
     </div>
   );
 };

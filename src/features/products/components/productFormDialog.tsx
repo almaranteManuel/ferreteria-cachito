@@ -166,7 +166,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
             {/* Fila 2: Precio Venta y Precio Propio/Costo */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Precio de Venta ($)</Label>
+                <Label htmlFor="price">Precio mayorista ($)</Label>
                 <Input
                   id="price"
                   type="number"
@@ -180,7 +180,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 <Label htmlFor="ownPrice">Precio Costo / Propio</Label>
                 <Input
                   id="ownPrice"
-                  placeholder="Ej: $1500 + IVA"
+                  placeholder="Opcional"
                   value={ownPrice}
                   onChange={(e) => setOwnPrice(e.target.value)}
                 />
@@ -200,7 +200,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="variant">Variante / Subtipo</Label>
+                <Label htmlFor="variant">Variante de venta</Label>
                 <Input
                   id="variant"
                   type="number"
@@ -210,7 +210,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                   onChange={(e) => setVariant(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="categoryId">ID Categoría</Label>
                 <Input
                   id="categoryId"
@@ -219,7 +219,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 
